@@ -28,11 +28,11 @@
 
 ### Film compatibily
 
--**Film swipe**
+- **Film swipe**
 
 ### Date compatibily
 
---**Date swipe** : with category
+- **Date swipe** : with category
 
 
 
