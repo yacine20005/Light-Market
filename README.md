@@ -24,6 +24,17 @@
 
 - **Private Space**: Secure diary to share your thoughts (optional)
 - **Synchronization**: Your data is saved and synced in real time
+- **daily diary**: Chaque jour des textes et photos du jour partagé avec l'autre
+
+### Film compatibily
+
+- **Film swipe**
+
+### Date compatibily
+
+- **Date swipe** : with category
+
+
 
 ### 💎 Premium Model
 
