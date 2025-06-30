@@ -24,17 +24,15 @@
 
 - **Private Space**: Secure diary to share your thoughts (optional)
 - **Synchronization**: Your data is saved and synced in real time
-- **daily diary**: Chaque jour des textes et photos du jour partagé avec l'autre
+- **Daily Journal**: Share daily texts and photos with your partner
 
-### Film compatibily
+### 🎬 Film Compatibility
 
-- **Film swipe**
+- **Film Swipe**: Swipe through movie suggestions. When both partners swipe right on a film, it's a match! Discover movies you'll both love to watch together.
 
-### Date compatibily
+### 📅 Date Compatibility
 
-- **Date swipe** : with category
-
-
+- **Date Swipe**: Explore a curated list of date ideas. Swipe right on activities you'd enjoy, categorized for easy Browse. Find the perfect date night that appeals to both of you!
 
 ### 💎 Premium Model
 
@@ -56,3 +54,5 @@ The app will soon be available on:
 - **Google Play Store** (Android)
 
 *Strengthen your relationship, one question at a time* ❤️
+
+---
