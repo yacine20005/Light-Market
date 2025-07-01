@@ -7,7 +7,6 @@ import Colors from "@/constants/Colors";
 import { useColorScheme } from "@/components/useColorScheme";
 import { useClientOnlyValue } from "@/components/useClientOnlyValue";
 
-// You can explore the built-in icon families and icons on the web at https://icons.expo.fyi/
 function TabBarIcon(props: {
   name: React.ComponentProps<typeof FontAwesome>["name"];
   color: string;
@@ -22,16 +21,35 @@ export default function TabLayout() {
     <Tabs
       screenOptions={{
         tabBarActiveTintColor: Colors[colorScheme ?? "light"].tint,
-        // Disable the static render of the header on web
-        // to prevent a hydration error in React Navigation v6.
         headerShown: useClientOnlyValue(false, true),
+        headerTransparent: true,
+        tabBarStyle: {
+          backgroundColor: colorScheme === "dark" ? "rgba(0, 0, 0, 0.8)" : "rgba(255, 255, 255, 0.8)",
+          borderTopWidth: 0,
+          position: "absolute",
+          elevation: 0,
+        },
       }}
     >
       <Tabs.Screen
-        name="home"
+        name="quizzes"
         options={{
-          title: "Tab One",
-          tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
+          title: "Quizzes",
+          tabBarIcon: ({ color }) => <TabBarIcon name="question-circle" color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="journal"
+        options={{
+          title: "Journal",
+          tabBarIcon: ({ color }) => <TabBarIcon name="book" color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="index"
+        options={{
+          title: "Accueil",
+          tabBarIcon: ({ color }) => <TabBarIcon name="heart" color={color} />,
           headerRight: () => (
             <Link href="/modal" asChild>
               <Pressable>
@@ -49,17 +67,17 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="two"
+        name="activities"
         options={{
-          title: "Tab Two",
-          tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
+          title: "Activités",
+          tabBarIcon: ({ color }) => <TabBarIcon name="gamepad" color={color} />,
         }}
       />
       <Tabs.Screen
-        name="three"
+        name="profile"
         options={{
-          title: "Tab Three",
-          tabBarIcon: ({ color }) => <TabBarIcon name="star" color={color} />, // Choix d'icône différent pour la 3e tab
+          title: "Profil",
+          tabBarIcon: ({ color }) => <TabBarIcon name="user" color={color} />,
         }}
       />
     </Tabs>
