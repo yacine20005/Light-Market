@@ -27,22 +27,11 @@ export default function SettingsScreen() {
     Alert.alert("Feedback", "Envoi de commentaires");
   };
 
-  type MaterialCommunityIconName =
-    | "bell"
-    | "palette"
-    | "refresh"
-    | "database"
-    | "information"
-    | "message-text"
-    | "star"
-    | "cog"
-    | "shield-star";
-
   interface SettingsOption {
     id: string;
     title: string;
     description: string;
-    icon: MaterialCommunityIconName;
+    icon: any;
     onPress: () => void;
     showArrow?: boolean;
     showToggle?: boolean;

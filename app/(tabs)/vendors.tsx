@@ -5,22 +5,13 @@ import { LinearGradient } from "expo-linear-gradient";
 import Colors from "@/constants/Colors";
 
 export default function VendorsScreen() {
-  type MaterialCommunityIconName =
-    | "hammer-wrench"
-    | "shield-star"
-    | "shield-account"
-    | "sword-cross"
-    | "coin"
-    | "shield-plus"
-    | "bow-arrow"
-    | "snowflake";
 
   type Vendor = {
     id: string;
     name: string;
     location: string;
     status: string;
-    icon: MaterialCommunityIconName;
+    icon: any; 
     color: string;
     specialty: string;
     description: string;
