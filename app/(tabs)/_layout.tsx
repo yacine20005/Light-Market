@@ -1,17 +1,24 @@
 import React from "react";
-import FontAwesome from "@expo/vector-icons/FontAwesome";
-import { Link, Tabs } from "expo-router";
-import { Pressable } from "react-native";
+import { MaterialCommunityIcons, Ionicons } from "@expo/vector-icons";
+import { Tabs } from "expo-router";
 
 import Colors from "@/constants/Colors";
 import { useColorScheme } from "@/components/useColorScheme";
-import { useClientOnlyValue } from "@/components/useClientOnlyValue";
 
-function TabBarIcon(props: {
-  name: React.ComponentProps<typeof FontAwesome>["name"];
+function MaterialIcon(props: {
+  name: React.ComponentProps<typeof MaterialCommunityIcons>["name"];
   color: string;
 }) {
-  return <FontAwesome size={28} style={{ marginBottom: -3 }} {...props} />;
+  return (
+    <MaterialCommunityIcons size={24} style={{ marginBottom: -3 }} {...props} />
+  );
+}
+
+function IonicIcon(props: {
+  name: React.ComponentProps<typeof Ionicons>["name"];
+  color: string;
+}) {
+  return <Ionicons size={24} style={{ marginBottom: -3 }} {...props} />;
 }
 
 export default function TabLayout() {
@@ -20,64 +27,69 @@ export default function TabLayout() {
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? "light"].tint,
-        headerShown: useClientOnlyValue(false, true),
-        headerTransparent: true,
+        tabBarActiveTintColor: Colors.destiny.primary,
+        tabBarInactiveTintColor: Colors.destiny.ghost + "60",
+        headerShown: true,
+        headerTransparent: false,
+        headerStyle: {
+          backgroundColor: Colors.destiny.dark,
+          borderBottomWidth: 1,
+          borderBottomColor: "rgba(0, 212, 255, 0.2)",
+        },
+        headerTitleStyle: {
+          color: Colors.destiny.ghost,
+          fontSize: 18,
+          fontWeight: "600",
+        },
+        headerTitleAlign: "center",
+        headerTintColor: Colors.destiny.ghost,
         tabBarStyle: {
-          backgroundColor: colorScheme === "dark" ? "rgba(0, 0, 0, 0.8)" : "rgba(255, 255, 255, 0.8)",
-          borderTopWidth: 0,
-          position: "absolute",
+          backgroundColor: Colors.destiny.dark,
+          borderTopWidth: 1,
+          borderTopColor: "rgba(0, 212, 255, 0.2)",
           elevation: 0,
+          paddingBottom: 8,
+          paddingTop: 8,
+          height: 80,
+        },
+        tabBarLabelStyle: {
+          fontSize: 12,
+          fontWeight: "600",
         },
       }}
     >
       <Tabs.Screen
-        name="quizzes"
+        name="xur"
         options={{
-          title: "Quizzes",
-          tabBarIcon: ({ color }) => <TabBarIcon name="question-circle" color={color} />,
+          title: "Xûr",
+          tabBarIcon: ({ color }) => (
+            <MaterialIcon name="alien" color={color} />
+          ),
         }}
       />
       <Tabs.Screen
-        name="journal"
+        name="vendors"
         options={{
-          title: "Journal",
-          tabBarIcon: ({ color }) => <TabBarIcon name="book" color={color} />,
+          title: "Vendeurs",
+          tabBarIcon: ({ color }) => (
+            <MaterialIcon name="store" color={color} />
+          ),
         }}
       />
       <Tabs.Screen
         name="index"
         options={{
           title: "Accueil",
-          tabBarIcon: ({ color }) => <TabBarIcon name="heart" color={color} />,
-          headerRight: () => (
-            <Link href="/modal" asChild>
-              <Pressable>
-                {({ pressed }) => (
-                  <FontAwesome
-                    name="info-circle"
-                    size={25}
-                    color={Colors[colorScheme ?? "light"].text}
-                    style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
-                  />
-                )}
-              </Pressable>
-            </Link>
+          tabBarIcon: ({ color }) => <IonicIcon name="home" color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="settings"
+        options={{
+          title: "Paramètres",
+          tabBarIcon: ({ color }) => (
+            <IonicIcon name="settings" color={color} />
           ),
-        }}
-      />
-      <Tabs.Screen
-        name="activities"
-        options={{
-          title: "Activités",
-          tabBarIcon: ({ color }) => <TabBarIcon name="gamepad" color={color} />,
-        }}
-      />
-      <Tabs.Screen
-        name="profile"
-        options={{
-          title: "Profil",
-          tabBarIcon: ({ color }) => <TabBarIcon name="user" color={color} />,
         }}
       />
     </Tabs>

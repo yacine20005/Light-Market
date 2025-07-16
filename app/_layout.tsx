@@ -10,8 +10,10 @@ import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
 import "react-native-reanimated";
 import { LinearGradient } from "expo-linear-gradient";
+import { StatusBar } from "expo-status-bar";
 
 import { useColorScheme } from "@/components/useColorScheme";
+import Colors from "@/constants/Colors";
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -26,28 +28,29 @@ export const unstable_settings = {
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 
-const MyDarkTheme = {
+const DestinyDarkTheme = {
   ...DarkTheme,
   colors: {
     ...DarkTheme.colors,
     background: "transparent",
+    primary: Colors.destiny.primary,
+    text: Colors.destiny.ghost,
   },
 };
 
-const MyLightTheme = {
+const DestinyLightTheme = {
   ...DefaultTheme,
   colors: {
     ...DefaultTheme.colors,
     background: "transparent",
+    primary: Colors.destiny.primary,
+    text: Colors.destiny.dark,
   },
 };
 
 export default function RootLayout() {
   const [loaded, error] = useFonts({
     SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
-    "Poppins-Regular": require("../assets/fonts/Poppins-Regular.ttf"),
-    "Poppins-SemiBold": require("../assets/fonts/Poppins-SemiBold.ttf"),
-    "Poppins-Bold": require("../assets/fonts/Poppins-Bold.ttf"),
     ...FontAwesome.font,
   });
 
@@ -76,16 +79,21 @@ function RootLayoutNav() {
   const colorScheme = useColorScheme();
 
   return (
-    <ThemeProvider value={colorScheme === "dark" ? MyDarkTheme : MyLightTheme}>
+    <ThemeProvider
+      value={colorScheme === "dark" ? DestinyDarkTheme : DestinyLightTheme}
+    >
+      <StatusBar style="light" />
       <LinearGradient
-        colors={
-          colorScheme === "dark"
-            ? ["#2C0724", "#6A114C"]
-            : ["#FFC3A0", "#FFACAC"]
-        }
+        colors={[
+          Colors.destiny.dark,
+          "#1A1A2E",
+          Colors.destiny.surface,
+          Colors.destiny.dark,
+        ]}
         style={{ flex: 1 }}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
+        locations={[0, 0.3, 0.7, 1]}
       >
         <Stack
           screenOptions={{
