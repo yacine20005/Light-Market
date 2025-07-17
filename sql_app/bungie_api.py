@@ -1,0 +1,41 @@
+import os
+import httpx
+from dotenv import load_dotenv
+
+load_dotenv()
+
+# Get the Bungie API key from the environment variables
+BUNGIE_API_KEY = os.getenv("BUNGIE_API_KEY")
+BUNGIE_API_URL = "https://www.bungie.net/Platform"
+
+# Create an asynchronous HTTP client. Using an async client is crucial
+# for a non-blocking FastAPI application. This allows the server to handle
+# other requests while waiting for the Bungie API to respond.
+async_client = httpx.AsyncClient()
+
+async def make_bungie_request(endpoint: str, params: dict = None):
+    """
+    Makes an authenticated GET request to the Bungie.net API.
+
+    Args:
+        endpoint: The API endpoint path (e.g., "/Destiny2/Vendors/").
+        params: A dictionary of query parameters.
+
+    Returns:
+        The JSON response from the API as a dictionary.
+    """
+    headers = {"X-API-Key": BUNGIE_API_KEY}
+    url = f"{BUNGIE_API_URL}{endpoint}"
+
+    try:
+        response = await async_client.get(url, headers=headers, params=params)
+        response.raise_for_status()  # Raise an exception for non-200 status codes
+        return response.json()
+    except httpx.HTTPStatusError as exc:
+        # Handle HTTP errors (e.g., 4xx, 5xx)
+        print(f"Error response {exc.response.status_code} while requesting {exc.request.url!r}.")
+        return None
+    except httpx.RequestError as exc:
+        # Handle other request errors (e.g., network issues)
+        print(f"An error occurred while requesting {exc.request.url!r}.")
+        return None
