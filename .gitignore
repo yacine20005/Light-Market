@@ -39,3 +39,10 @@ yarn-error.*
 
 # Python cache
 __pycache__/
+
+# manifest files
+manifest/
+
+# venv
+.venv/
+

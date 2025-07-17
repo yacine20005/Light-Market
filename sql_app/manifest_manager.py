@@ -51,12 +51,10 @@ async def download_and_unzip_manifest(url: str, dest_path: Path):
     """
     print(f"Downloading manifest from: https://www.bungie.net{url}")
     try:
-        # Use a longer timeout as the manifest can be a large file
-        async with httpx.AsyncClient(timeout=300.0) as client:
+        async with httpx.AsyncClient(timeout=360.0) as client:
             response = await client.get(f"https://www.bungie.net{url}")
             response.raise_for_status()
 
-        # Save the downloaded zip file temporarily
         zip_path = MANIFEST_DIRECTORY / "manifest.zip"
         zip_path.write_bytes(response.content)
         print("Download complete. Unzipping...")
@@ -70,17 +68,13 @@ async def download_and_unzip_manifest(url: str, dest_path: Path):
             if not content_filename:
                 raise FileNotFoundError("Could not find the .content file inside the manifest zip.")
 
-            # Extract the .content file
             zip_ref.extract(content_filename, path=MANIFEST_DIRECTORY)
 
-            # Rename the extracted file to our desired name (e.g., manifest.sqlite)
-            # This will overwrite the old file if it exists.
             extracted_file = MANIFEST_DIRECTORY / content_filename
             if dest_path.exists():
                 os.remove(dest_path)
             extracted_file.rename(dest_path)
 
-        # Clean up the downloaded zip file
         os.remove(zip_path)
         print(f"Manifest successfully extracted to: {dest_path}")
 
@@ -99,7 +93,6 @@ async def update_manifest_if_needed():
         return
 
     try:
-        # The path to the English version of the mobile manifest
         new_manifest_path = metadata['Response']['mobileWorldContentPaths']['en']
     except KeyError:
         print("Could not find the English manifest path in the API response.")
@@ -107,7 +100,7 @@ async def update_manifest_if_needed():
 
     current_manifest_version = ""
     if MANIFEST_INFO_FILE.exists():
-        with open(MANIFEST_INFO_FILE, 'r') as f:
+        with open(MANIFEST_INFO_FILE, 'r', encoding='utf-8') as f:
             try:
                 info = json.load(f)
                 current_manifest_version = info.get('version_path', '')
@@ -120,13 +113,10 @@ async def update_manifest_if_needed():
         print(f"New manifest version detected. Current: '{current_manifest_version}', New: '{new_manifest_path}'")
         await download_and_unzip_manifest(new_manifest_path, MANIFEST_DB_FILE)
 
-        # Save the new version info to the tracking file
-        with open(MANIFEST_INFO_FILE, 'w') as f:
+        with open(MANIFEST_INFO_FILE, 'w', encoding='utf-8') as f:
             json.dump({'version_path': new_manifest_path}, f)
         print("Manifest update process complete.")
 
-# --- Main Execution ---
 if __name__ == "__main__":
     print("Running manifest update check...")
-    # This allows the async functions to be run from the command line
     asyncio.run(update_manifest_if_needed())
