@@ -12,7 +12,7 @@ load_dotenv()
 BUNGIE_API_KEY = os.getenv("BUNGIE_API_KEY")
 BUNGIE_API_URL = "https://www.bungie.net/Platform"
 
-MANIFEST_DIRECTORY = Path(__file__).parent.parent / "manifest"
+MANIFEST_DIRECTORY = Path(__file__).parent / "manifest"
 MANIFEST_DB_FILE = MANIFEST_DIRECTORY / "manifest.sqlite"
 MANIFEST_INFO_FILE = MANIFEST_DIRECTORY / "manifest_info.json"
 MANIFEST_DIRECTORY.mkdir(exist_ok=True)
@@ -43,7 +43,6 @@ async def get_manifest_metadata():
         print(f"A network error occurred while fetching manifest metadata: {exc}")
         return None
 
-# --- Manifest File Management ---
 async def download_and_unzip_manifest(url: str, dest_path: Path):
     """
     Downloads a file from a URL, unzips it, finds the .content file,

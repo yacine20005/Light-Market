@@ -1,6 +1,6 @@
 
 from fastapi import APIRouter, HTTPException
-from sql_app import bungie_api
+from backend import bungie_api
 
 router = APIRouter()
 
@@ -24,7 +24,6 @@ async def get_public_vendors():
     params = {"components": "400,402,300,304,305"}
     endpoint = "/Destiny2/Vendors/"
 
-    vendor_data = await bungie_api.make_bungie_request(endpoint, params=params)
     vendor_data = await bungie_api.make_bungie_request(endpoint, params=params)
     if vendor_data is None:
         raise HTTPException(status_code=502, detail="Upstream Bungie API error")

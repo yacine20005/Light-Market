@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "spark-love",
-    "slug": "spark-love",
+    "name": "light-market",
+    "slug": "light-market",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "sparklove",
+    "scheme": "light-market",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "splash": {
