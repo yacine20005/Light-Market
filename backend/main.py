@@ -1,8 +1,9 @@
 from fastapi import FastAPI
-from .routers import vendors
+from .routers import vendors, xur
 
 app = FastAPI()
 app.include_router(vendors.router)
+app.include_router(xur.router)
 
 @app.get("/")
 def read_root():
