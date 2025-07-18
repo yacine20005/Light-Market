@@ -48,6 +48,36 @@ class ManifestDecoder:
         """Récupère la définition d'un item."""
         return self.get_definition("DestinyInventoryItemDefinition", item_hash)
 
+    def get_extended_item_definition(self, item_hash):
+        """
+        Récupère une définition d'item étendue avec plus de détails.
+        Utile pour les items spéciaux comme les catégories de vendor.
+        """
+        item_def = self.get_item_definition(item_hash)
+        if not item_def:
+            return None
+            
+        # Ajouter des informations supplémentaires si l'item est une catégorie
+        if item_def.get('itemType') == 19:  # Type 19 = Vendor Category
+            # Chercher les vendor groups associés
+            vendor_hash = item_def.get('vendorHash')
+            if vendor_hash:
+                vendor_def = self.get_vendor_definition(vendor_hash)
+                if vendor_def:
+                    item_def['associatedVendor'] = vendor_def
+                    
+        # Ajouter les informations de socket si disponibles
+        if 'sockets' in item_def:
+            socket_entries = item_def['sockets'].get('socketEntries', [])
+            for socket in socket_entries:
+                plug_hash = socket.get('singleInitialItemHash')
+                if plug_hash:
+                    plug_def = self.get_definition("DestinyInventoryItemDefinition", plug_hash)
+                    if plug_def:
+                        socket['plugDefinition'] = plug_def
+                        
+        return item_def
+
     def get_vendor_definition(self, vendor_hash):
         """Récupère la définition d'un vendor."""
         return self.get_definition("DestinyVendorDefinition", vendor_hash)
