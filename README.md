@@ -1,38 +1,24 @@
-# 🚀 Destiny 2 Vendor Checker (Expo + FastAPI) 🌌
+# 🚀 Destiny 2 Xur Inventory Checker (Expo + FastAPI) 🌌
 
------
-
-## Table of Contents
-
-* [🌟 About the Project](https://www.google.com/search?q=%23-about-the-project)
-* [✨ Core Features](https://www.google.com/search?q=%23-core-features)
-* [🛠️ Technologies Used](https://www.google.com/search?q=%23%25EF%25B8%258F-technologies-used)
-* [💡 My Project Goals & Ambition](https://www.google.com/search?q=%23-my-project-goals--ambition)
-* [🏗️ Architecture Overview](https://www.google.com/search?q=%23%25EF%25B8%258F-architecture-overview)
-* [🔮 Future Enhancements](https://www.google.com/search?q=%23-future-enhancements)
-* [🤝 Contribution](https://www.google.com/search?q=%23-contribution)
-* [📄 License](https://www.google.com/search?q=%23-license)
-* [📧 Contact](https://www.google.com/search?q=%23-contact)
-
------
+----
 
 ## 🌟 About the Project
 
-This project is a **mobile application** designed to be a **"Vendor Checker"** for the popular game **Destiny 2**. Built with **Expo (React Native)** for the frontend and **FastAPI (Python)** for the backend, its main purpose is to give Destiny 2 Guardians a quick and intuitive way to see what key in-game vendors (like **Xûr**, **Banshee-44**, and **Ada-1**) are selling.
+This project is a **mobile application** designed to be a **"Xur Inventory Checker"** for the popular game **Destiny 2**. Built with **Expo (React Native)** for the frontend and **FastAPI (Python)** for the backend, its main purpose is to give Destiny 2 Guardians a quick and intuitive way to see what **Xûr** is selling.
 
-A central feature of this application is its ability to **decode and clearly display the "rolls" (random perks)** on weapons and armor. This means no more needing to log into the game or check external websites just to find out if a vendor has that perfect gear piece or a crucial mod\!
+A central feature of this application is its ability to **decode and clearly display the "rolls" (random perks)** on weapons and armor. This means no more needing to log into the game or check external websites just to find out if Xur has that perfect gear piece!
 
------
+----
 
 ## ✨ Core Features
 
-* **Real-time Vendor Inventories:** See what active vendors are offering right now.
+* **Real-time Xur Inventory:** See what Xûr is offering right now.
 * **Detailed Item Information:** View names, icons, and base stats for all items.
 * **"Roll" Decryption:** Understand the specific perks and stats on weapons and armor, a crucial aspect for optimal gameplay.
 * **Cost Breakdown:** Easily see the materials and currency required for each purchase.
-* **Automatic Data Refresh:** Vendor inventories are automatically updated following in-game resets.
+* **Automatic Data Refresh:** Xur's inventory is automatically updated following his weekly arrival.
 
------
+----
 
 ## 🛠️ Technologies Used
 
@@ -47,7 +33,7 @@ A central feature of this application is its ability to **decode and clearly dis
 * **Pydantic:** Used for powerful data validation and modeling within FastAPI.
 * **`requests` (Python):** For secure and reliable external API calls (e.g., to Bungie.net).
 
------
+----
 
 ## 💡 My Project Goals & Ambition
 
@@ -59,7 +45,7 @@ This project is more than just a utility for Destiny 2; it's a significant miles
 4. **Client-Server Architecture:** To design and implement a robust client-server architecture, ensuring seamless communication between the mobile app and the dedicated backend.
 5. **Portfolio Enhancement:** To create a tangible, functional, and highly practical project that showcases my technical abilities and problem-solving skills to prospective employers as I seek an apprenticeship opportunity.
 
------
+----
 
 ## 🏗️ Architecture Overview
 
@@ -91,27 +77,25 @@ The application adopts a standard client-server architecture to ensure efficienc
 
 The **FastAPI backend** is central to this design. It acts as both a proxy and a decoder for the Destiny 2 Manifest. This approach means the Expo mobile application doesn't need to handle the heavy task of downloading and querying the large Manifest file, which significantly optimizes the app's performance and data usage for the end-user.
 
------
+----
 
 ## 🔮 Future Enhancements
 
 * **Advanced Manifest Management:** Implementing a more sophisticated system for robust, automated Manifest updates on the backend.
 * **Enhanced "Roll" Details:** Further refining the display of perks and stats for ultimate clarity and user benefit.
-* **Search & Filtering:** Adding powerful search and filtering capabilities for items and vendors.
-* **Historical Data:** Introducing the ability to view past vendor inventories.
 * **UI/UX Refinement:** Continuous improvement of the application's design for an even more intuitive and visually appealing experience.
 * **Backend Deployment:** Deploying the FastAPI backend to a cloud service to make the application globally accessible.
 
------
+----
 
 ## 🤝 Contribution
 
 Contributions are always welcome\! If you have ideas, improvements, or encounter any issues, please feel free to open an issue or submit a pull request.
 
------
+----
 
 ## 📧 Contact
 
 For any questions or further information, please feel free to reach out via my GitHub profile.
 
------
+----

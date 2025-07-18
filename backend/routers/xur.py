@@ -5,7 +5,7 @@ from backend.manifest_decoder import manifest_decoder
 
 router = APIRouter()
 
-@router.get("/vendors/xur")
+@router.get("/xur")
 async def get_xur_inventory():
     """
     Fetches Xûr's current inventory with decoded item names and descriptions.

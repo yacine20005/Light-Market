@@ -79,8 +79,10 @@ async def download_and_unzip_manifest(url: str, dest_path: Path):
 
     except httpx.RequestError as exc:
         print(f"Failed to download manifest: {exc}")
-    except Exception as e:
-        print(f"An error occurred during extraction: {e}")
+    except zipfile.BadZipFile as e:
+        print(f"An error occurred during extraction (bad zip file): {e}")
+    except FileNotFoundError as e:
+        print(f"An error occurred (file not found): {e}")
 
 
 async def update_manifest_if_needed():
