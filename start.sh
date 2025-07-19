@@ -7,7 +7,7 @@ YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
-API_URL="http://localhost:8000"
+API_URL="http://192.168.1.112:8000"
 HEALTH_ENDPOINT="/health"
 
 echo -e "${BLUE}🚀 Démarrage de Light Market${NC}"

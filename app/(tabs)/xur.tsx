@@ -36,7 +36,7 @@ export default function XurScreen() {
           <MaterialCommunityIcons
             name="alert-circle"
             size={64}
-            color={Colors.destiny.error || "#ef4444"}
+            color="#ef4444"
           />
           <Text style={styles.errorTitle}>Erreur</Text>
           <Text style={styles.errorText}>{error}</Text>
