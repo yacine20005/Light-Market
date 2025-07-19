@@ -1,176 +1,285 @@
-import React from 'react';
-import { StyleSheet, TouchableOpacity } from 'react-native';
-import { Text, View } from './Themed';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { LinearGradient } from 'expo-linear-gradient';
-import Colors from '@/constants/Colors';
-import { XurInventoryItem } from '@/services/api';
+import React from "react";
+import { StyleSheet, TouchableOpacity, Image, Dimensions } from "react-native";
+import { Text, View } from "./Themed";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
+import Colors from "@/constants/Colors";
+
+const { width: screenWidth } = Dimensions.get("window");
 
 interface XurItemCardProps {
-  item: XurInventoryItem;
-  onPress?: () => void;
+  item: {
+    itemName: string;
+    itemDescription: string;
+    itemIcon: string;
+    rarity: string;
+    costs: Array<{
+      itemHash: number;
+      quantity: number;
+      hasConditionalVisibility: boolean;
+    }>;
+    itemHash: number;
+    vendorItemIndex: number;
+    quantity: number;
+  };
+  onPress: () => void;
 }
 
-const getItemIcon = (itemType: number, itemSubType: number): string => {
-  // Weapon types
-  if (itemType === 3) {
-    switch (itemSubType) {
-      case 6: return 'pistol'; // Hand Cannon
-      case 7: return 'pistol'; // Shotgun
-      case 8: return 'pistol'; // Sniper Rifle
-      case 9: return 'rifle'; // Fusion Rifle
-      case 10: return 'rifle'; // Rocket Launcher
-      case 11: return 'sword'; // Sword
-      case 12: return 'bow-arrow'; // Bow
-      case 13: return 'rifle'; // Auto Rifle
-      case 14: return 'rifle'; // Pulse Rifle
-      case 15: return 'rifle'; // Scout Rifle
-      case 16: return 'pistol'; // Sidearm
-      case 17: return 'rifle'; // Linear Fusion Rifle
-      case 18: return 'rifle'; // Grenade Launcher
-      case 19: return 'rifle'; // Submachine Gun
-      case 20: return 'rifle'; // Trace Rifle
-      case 21: return 'rifle'; // Machine Gun
-      default: return 'rifle';
-    }
-  }
-  
-  // Armor types
-  if (itemType === 2) {
-    switch (itemSubType) {
-      case 26: return 'shield'; // Helmet
-      case 27: return 'shield-account'; // Gauntlets
-      case 28: return 'shield-star'; // Chest Armor
-      case 29: return 'shield-check'; // Leg Armor
-      case 30: return 'shield-plus'; // Class Armor
-      default: return 'shield';
-    }
-  }
-  
-  return 'star';
-};
-
-const getClassTypeLabel = (classType: number): string => {
-  switch (classType) {
-    case 0: return 'Titan';
-    case 1: return 'Hunter';
-    case 2: return 'Warlock';
-    default: return 'Tous';
+const getRarityColor = (rarity: string) => {
+  switch (rarity.toLowerCase()) {
+    case "exotic":
+      return Colors.destiny.exotic;
+    case "legendary":
+      return "#522F9A";
+    case "rare":
+      return "#5076A3";
+    case "uncommon":
+      return "#366F3F";
+    case "common":
+      return "#C3BCDB";
+    default:
+      return Colors.destiny.primary;
   }
 };
 
-const formatCosts = (costs: Array<{ itemHash: string; quantity: number }>): string => {
-  if (!costs || costs.length === 0) return 'Gratuit';
-  
-  return costs.map(cost => {
-    // Common currency hashes in Destiny 2
-    switch (cost.itemHash) {
-      case '3159615086': return `${cost.quantity} Legendary Shards`;
-      case '2817410917': return `${cost.quantity} Bright Dust`;
-      case '353932628': return `${cost.quantity} Enhancement Core`;
-      default: return `${cost.quantity} Items`;
-    }
-  }).join(', ');
+const getCurrencyName = (itemHash: number) => {
+  switch (itemHash) {
+    case 800069450:
+      return "Strange Coins";
+    case 2817410917:
+      return "Glimmer";
+    default:
+      return "Unknown";
+  }
+};
+
+const getCurrencyIcon = (itemHash: number) => {
+  switch (itemHash) {
+    case 800069450:
+      return "currency-usd";
+    case 2817410917:
+      return "triangle";
+    default:
+      return "help-circle";
+  }
 };
 
 export default function XurItemCard({ item, onPress }: XurItemCardProps) {
-  const iconName = getItemIcon(item.itemType, item.itemSubType);
-  const classLabel = getClassTypeLabel(item.classType);
-  const costLabel = formatCosts(item.costs);
-  
-  const rarityColor = item.rarity === 'Exotic' ? Colors.destiny.exotic : Colors.destiny.legendary;
+  const rarityColor = getRarityColor(item.rarity);
+  const imageUri = `https://www.bungie.net${item.itemIcon}`;
+  const isSpecialOffer =
+    item.itemName.includes("Strange") || item.costs.length === 0;
 
   return (
-    <TouchableOpacity style={styles.itemCard} onPress={onPress}>
-      <LinearGradient
-        colors={[
-          `${rarityColor}20`,
-          `${rarityColor}05`
-        ]}
-        style={styles.itemGradient}
-      >
-        <View style={styles.itemHeader}>
-          <MaterialCommunityIcons
-            name={iconName as any}
-            size={24}
-            color={rarityColor}
+    <TouchableOpacity
+      style={styles.container}
+      onPress={onPress}
+      activeOpacity={0.8}
+    >
+      <View style={[styles.cardGradient, { borderColor: `${rarityColor}30` }]}>
+        {/* Item Image */}
+        <View style={[styles.imageContainer, { borderColor: rarityColor }]}>
+          <Image
+            source={{ uri: imageUri }}
+            style={styles.itemImage}
+            resizeMode="cover"
           />
-          <View style={styles.itemInfo}>
-            <Text style={[styles.itemName, { color: rarityColor }]}>
-              {item.name}
+          <LinearGradient
+            colors={[`${rarityColor}00`, `${rarityColor}20`]}
+            style={styles.imageOverlay}
+          />
+        </View>
+
+        {/* Item Info */}
+        <View style={styles.itemInfo}>
+          <View style={styles.itemHeader}>
+            <Text
+              style={[styles.itemName, { color: rarityColor }]}
+              numberOfLines={2}
+            >
+              {item.itemName}
             </Text>
-            {item.classType !== 3 && (
-              <Text style={styles.classLabel}>{classLabel}</Text>
+            <View
+              style={[
+                styles.rarityBadge,
+                { backgroundColor: `${rarityColor}20` },
+              ]}
+            >
+              <Text style={[styles.rarityText, { color: rarityColor }]}>
+                {item.rarity}
+              </Text>
+            </View>
+          </View>
+
+          {item.itemDescription && (
+            <Text style={styles.itemDescription} numberOfLines={2}>
+              {item.itemDescription}
+            </Text>
+          )}
+
+          {/* Price */}
+          <View style={styles.priceSection}>
+            {item.costs.length > 0 ? (
+              <View style={styles.priceContainer}>
+                <MaterialCommunityIcons
+                  name={getCurrencyIcon(item.costs[0].itemHash)}
+                  size={16}
+                  color={Colors.destiny.accent}
+                />
+                <Text style={styles.priceText}>
+                  {item.costs[0].quantity}{" "}
+                  {getCurrencyName(item.costs[0].itemHash)}
+                </Text>
+              </View>
+            ) : (
+              <Text style={styles.freeText}>Gratuit</Text>
+            )}
+
+            {isSpecialOffer && (
+              <View style={styles.specialBadge}>
+                <MaterialCommunityIcons
+                  name="star"
+                  size={12}
+                  color={Colors.destiny.exotic}
+                />
+                <Text style={styles.specialText}>SPÉCIAL</Text>
+              </View>
             )}
           </View>
-          <Text style={[styles.itemPrice, { color: rarityColor }]}>
-            {costLabel}
-          </Text>
         </View>
-        
-        <View style={styles.itemDetails}>
-          <Text style={styles.rarityLabel}>{item.rarity}</Text>
-          <Text style={styles.quantityLabel}>
-            Quantité: {item.quantity}
-          </Text>
+
+        {/* Tap indicator */}
+        <View style={styles.tapIndicator}>
+          <MaterialCommunityIcons
+            name="chevron-right"
+            size={20}
+            color={Colors.destiny.ghost}
+            style={{ opacity: 0.5 }}
+          />
         </View>
-      </LinearGradient>
+      </View>
     </TouchableOpacity>
   );
 }
 
 const styles = StyleSheet.create({
-  itemCard: {
-    marginBottom: 12,
-    borderRadius: 12,
-    overflow: 'hidden',
-    backgroundColor: 'rgba(30, 41, 59, 0.6)',
-    borderWidth: 1,
-    borderColor: 'rgba(251, 191, 36, 0.3)',
+  container: {
+    marginBottom: 16,
+    marginHorizontal: 4,
   },
-  itemGradient: {
+  cardGradient: {
+    flexDirection: "row",
     padding: 16,
-    backgroundColor: 'transparent',
+    borderRadius: 16,
+    borderWidth: 1,
+    backgroundColor: "rgba(15, 11, 31, 1)",
+    // Shadow for iOS
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.15,
+    shadowRadius: 3.84,
+    // Elevation for Android
+    elevation: 3,
   },
-  itemHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 8,
-    backgroundColor: 'transparent',
+  imageContainer: {
+    width: 64,
+    height: 64,
+    borderRadius: 12,
+    borderWidth: 2,
+    overflow: "hidden",
+    position: "relative",
+  },
+  itemImage: {
+    width: "100%",
+    height: "100%",
+  },
+  imageOverlay: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
   },
   itemInfo: {
     flex: 1,
-    marginLeft: 12,
-    backgroundColor: 'transparent',
+    marginLeft: 16,
+    justifyContent: "space-between",
+    backgroundColor: "rgba(15, 11, 31, 1)",
+  },
+  itemHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
+    marginBottom: 4,
+    backgroundColor: "transparent",
   },
   itemName: {
+    flex: 1,
     fontSize: 16,
-    fontWeight: 'bold',
-    marginBottom: 2,
+    fontWeight: "bold",
+    marginRight: 8,
   },
-  classLabel: {
-    fontSize: 12,
-    color: Colors.destiny.primary,
-    opacity: 0.8,
+  rarityBadge: {
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 10,
   },
-  itemPrice: {
-    fontSize: 14,
-    fontWeight: 'bold',
-    textAlign: 'right',
+  rarityText: {
+    fontSize: 10,
+    fontWeight: "bold",
+    textTransform: "uppercase",
+    letterSpacing: 0.5,
   },
-  itemDetails: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    backgroundColor: 'transparent',
-  },
-  rarityLabel: {
-    fontSize: 12,
-    color: Colors.destiny.accent,
-    fontWeight: '600',
-  },
-  quantityLabel: {
+  itemDescription: {
     fontSize: 12,
     color: Colors.destiny.ghost,
     opacity: 0.7,
+    marginBottom: 8,
+    lineHeight: 16,
+  },
+  priceSection: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    backgroundColor: "transparent",
+  },
+  priceContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "transparent",
+  },
+  priceText: {
+    fontSize: 14,
+    color: Colors.destiny.ghost,
+    fontWeight: "600",
+    marginLeft: 4,
+  },
+  freeText: {
+    fontSize: 14,
+    color: Colors.destiny.primary,
+    fontWeight: "600",
+  },
+  specialBadge: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: `${Colors.destiny.exotic}20`,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 8,
+  },
+  specialText: {
+    fontSize: 10,
+    color: Colors.destiny.exotic,
+    fontWeight: "bold",
+    marginLeft: 2,
+    letterSpacing: 0.5,
+  },
+  tapIndicator: {
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "transparent",
   },
 });

@@ -4,25 +4,27 @@ const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:8000';
 console.log('🌐 API_BASE_URL:', API_BASE_URL);
 
 export interface XurInventoryItem {
-  name: string;
-  hash: string;
-  itemType: number;
-  itemSubType: number;
-  classType: number;
-  rarity: string;
-  tierType: number;
-  costs: Array<{
-    itemHash: string;
-    quantity: number;
-  }>;
+  vendorItemIndex: number;
+  itemHash: number;
   quantity: number;
+  costs: Array<{
+    itemHash: number;
+    quantity: number;
+    hasConditionalVisibility: boolean;
+  }>;
+  itemName: string;
+  itemDescription: string;
+  itemIcon: string;
+  rarity: string;
 }
 
 export interface XurData {
   vendor: {
-    vendorHash: string;
+    vendorHash: number;
     nextRefreshDate: string;
     enabled: boolean;
+    name: string;
+    description: string;
   };
   sales: {
     saleItems: { [key: string]: XurInventoryItem };

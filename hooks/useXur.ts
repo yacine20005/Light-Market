@@ -14,11 +14,11 @@ export function useXur(): UseXurResult {
   const [xurData, setXurData] = useState<XurData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [currentTime, setCurrentTime] = useState(new Date());
 
   const calculateTimeUntilXur = useCallback((): string => {
     // Xûr arrives Friday 17:00 UTC and leaves Tuesday 17:00 UTC
-    const now = new Date();
-    const currentUTC = new Date(now.getTime() + (now.getTimezoneOffset() * 60000));
+    const currentUTC = new Date(currentTime.getTime() + (currentTime.getTimezoneOffset() * 60000));
     
     // Get current day (0 = Sunday, 1 = Monday, ..., 5 = Friday, 6 = Saturday)
     const currentDay = currentUTC.getUTCDay();
@@ -59,16 +59,16 @@ export function useXur(): UseXurResult {
     const days = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
     const hours = Math.floor((timeDiff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
     const minutes = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((timeDiff % (1000 * 60)) / 1000);
     
-    return `${days}j ${hours}h ${minutes}m`;
-  }, []);
+    return `${days}d ${hours}h ${minutes}m ${seconds}s`;
+  }, [currentTime]);
 
   const isXurPresent = useCallback((): boolean => {
     if (xurData?.isAvailable) return true;
     
     // Calculate based on time if API data is not available
-    const now = new Date();
-    const currentUTC = new Date(now.getTime() + (now.getTimezoneOffset() * 60000));
+    const currentUTC = new Date(currentTime.getTime() + (currentTime.getTimezoneOffset() * 60000));
     const currentDay = currentUTC.getUTCDay();
     const currentHour = currentUTC.getUTCHours();
     
@@ -76,7 +76,7 @@ export function useXur(): UseXurResult {
            currentDay === 6 || currentDay === 0 ||      // Weekend
            (currentDay === 1 && currentHour < 17) ||    // Monday before 17:00
            (currentDay === 2 && currentHour < 17);      // Tuesday before 17:00
-  }, [xurData]);
+  }, [xurData, currentTime]);
 
   const refreshXurData = useCallback(async () => {
     try {
@@ -96,6 +96,15 @@ export function useXur(): UseXurResult {
   useEffect(() => {
     refreshXurData();
   }, [refreshXurData]);
+
+  // Update time every second for live countdown
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, []);
 
   return {
     xurData,

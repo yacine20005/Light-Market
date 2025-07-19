@@ -1,15 +1,42 @@
-import { StyleSheet, ScrollView, TouchableOpacity, RefreshControl, ActivityIndicator } from "react-native";
+import {
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+  RefreshControl,
+  ActivityIndicator,
+} from "react-native";
 import { Text, View } from "@/components/Themed";
 import { MaterialCommunityIcons, Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import React, { useState } from "react";
 import Colors from "@/constants/Colors";
 import { useXur } from "@/hooks/useXur";
 import XurItemCard from "@/components/XurItemCard";
+import XurItemModal from "@/components/XurItemModal";
 
 export default function XurScreen() {
   const insets = useSafeAreaInsets();
-  const { xurData, isLoading, error, isXurPresent, timeUntilXur, refreshXurData } = useXur();
+  const {
+    xurData,
+    isLoading,
+    error,
+    isXurPresent,
+    timeUntilXur,
+    refreshXurData,
+  } = useXur();
+  const [selectedItem, setSelectedItem] = useState<any>(null);
+  const [modalVisible, setModalVisible] = useState(false);
+
+  const handleItemPress = (item: any) => {
+    setSelectedItem(item);
+    setModalVisible(true);
+  };
+
+  const closeModal = () => {
+    setModalVisible(false);
+    setSelectedItem(null);
+  };
 
   // Show loading state
   if (isLoading) {
@@ -24,7 +51,7 @@ export default function XurScreen() {
   // Show error state
   if (error) {
     return (
-      <ScrollView 
+      <ScrollView
         style={[styles.container, { paddingTop: insets.top }]}
         refreshControl={
           <RefreshControl
@@ -50,9 +77,10 @@ export default function XurScreen() {
     );
   }
 
+  // Show countdown when Xur is not present
   if (!isXurPresent) {
     return (
-      <ScrollView 
+      <ScrollView
         style={[styles.container, { paddingTop: insets.top }]}
         refreshControl={
           <RefreshControl
@@ -64,21 +92,47 @@ export default function XurScreen() {
       >
         {/* Countdown Section */}
         <LinearGradient
-          colors={["#522F9A", "#1E293B", "#522F9A"]}
+          colors={["#1A0B2E", "#2D1B69", "#0F0B1F"]}
           style={styles.countdownSection}
         >
           <View style={styles.countdownContent}>
-            <MaterialCommunityIcons
-              name="alien"
-              size={64}
-              color={Colors.destiny.accent}
-              style={styles.alienIcon}
-            />
-            <Text style={styles.countdownTitle}>Xûr arrives in</Text>
-            <Text style={styles.countdownTime}>{timeUntilXur}</Text>
+            <View style={styles.alienIconContainer}>
+              <MaterialCommunityIcons
+                name="alien"
+                size={80}
+                color="#8B5CF6"
+                style={styles.alienIcon}
+              />
+              <View style={styles.alienGlow} />
+            </View>
+            <Text style={styles.countdownTitle}>🚀 Xûr arrives in 🚀</Text>
+
+            {/* Modern Time Display */}
+            <View style={styles.timeContainer}>
+              <LinearGradient
+                colors={["#8B5CF620", "#8B5CF650", "#8B5CF620"]}
+                style={styles.timeCard}
+              >
+                <Text style={styles.countdownTime}>{timeUntilXur}</Text>
+                <View style={styles.timeGlow} />
+              </LinearGradient>
+            </View>
+
             <Text style={styles.countdownDescription}>
               The Agent of the Nine will return with new exotic equipment
             </Text>
+
+            {/* Decorative elements */}
+            <View style={styles.decorativeContainer}>
+              <View style={styles.decorativeLine} />
+              <MaterialCommunityIcons
+                name="rhombus-split"
+                size={16}
+                color="#8B5CF6"
+                style={{ opacity: 0.7 }}
+              />
+              <View style={styles.decorativeLine} />
+            </View>
           </View>
         </LinearGradient>
 
@@ -94,64 +148,155 @@ export default function XurScreen() {
     );
   }
 
+  // Xur is present - show inventory
+  const saleItems = xurData?.sales?.saleItems
+    ? Object.values(xurData.sales.saleItems)
+    : [];
+  const exoticItems = saleItems.filter(
+    (item) => item.rarity === "Exotic" && !item.itemName.includes("Strange")
+  );
+  const specialOffers = saleItems.filter(
+    (item) => item.itemName.includes("Strange") || item.costs.length === 0
+  );
+
   return (
-    <ScrollView 
-      style={[styles.container, { paddingTop: insets.top }]}
-      refreshControl={
-        <RefreshControl
-          refreshing={isLoading}
-          onRefresh={refreshXurData}
-          tintColor={Colors.destiny.accent}
-        />
-      }
-    >
-      {/* Xur Present Section */}
-      <LinearGradient
-        colors={["#522F9A", "#1E293B", "#522F9A"]}
-        style={styles.xurPresentSection}
-      >
-        <View style={styles.xurPresentContent}>
-          <MaterialCommunityIcons
-            name="alien"
-            size={48}
-            color={Colors.destiny.accent}
+    <>
+      <ScrollView
+        style={[styles.container, { paddingTop: insets.top }]}
+        refreshControl={
+          <RefreshControl
+            refreshing={isLoading}
+            onRefresh={refreshXurData}
+            tintColor={Colors.destiny.accent}
           />
-          <Text style={styles.xurPresentTitle}>Xûr est présent !</Text>
-          <Text style={styles.locationText}>📍 Quelque part dans le système</Text>
-          <Text style={styles.timeRemainingText}>Temps restant: {timeUntilXur}</Text>
-        </View>
-      </LinearGradient>
-
-      {/* Inventory Section */}
-      <View style={styles.inventorySection}>
-        <Text style={styles.sectionTitle}>Inventaire de Xûr</Text>
-
-        {xurData?.sales?.saleItems ? (
-          Object.entries(xurData.sales.saleItems).map(([key, item]) => (
-            <XurItemCard
-              key={key}
-              item={item}
-              onPress={() => {
-                // TODO: Open item detail modal
-                console.log('Item pressed:', item.name);
-              }}
-            />
-          ))
-        ) : (
-          <View style={styles.noItemsContainer}>
-            <MaterialCommunityIcons
-              name="package-variant"
-              size={48}
-              color={Colors.destiny.primary}
-              style={{ opacity: 0.5 }}
-            />
-            <Text style={styles.noItemsText}>
-              Aucun objet disponible pour le moment
+        }
+      >
+        {/* Xur Present Header */}
+        <LinearGradient
+          colors={["#1A0B2E", "#2D1B69", "#0F0B1F"]}
+          style={styles.headerSection}
+        >
+          <View style={styles.headerContent}>
+            <View style={styles.xurPresentIconContainer}>
+              <MaterialCommunityIcons name="alien" size={64} color="#8B5CF6" />
+              <View style={styles.xurPresentGlow} />
+            </View>
+            <Text style={styles.xurPresentTitle}>Xûr is here!</Text>
+            <Text style={styles.xurDescription}>
+              {xurData?.vendor?.description ||
+                "A peddler of strange curios, Xûr's motives are not his own."}
             </Text>
+
+            {/* Modern Countdown for Xur Present */}
+            <View style={styles.xurPresentCountdownContainer}>
+              <Text style={styles.xurPresentCountdownLabel}>
+                ⏰ Departure in
+              </Text>
+              <LinearGradient
+                colors={["#D4AF3720", "#D4AF3750", "#D4AF3720"]}
+                style={styles.xurPresentTimeCard}
+              >
+                <Text style={styles.xurPresentCountdownTime}>
+                  {timeUntilXur}
+                </Text>
+                <View style={styles.xurPresentTimeGlow} />
+              </LinearGradient>
+              <Text style={styles.xurPresentCountdownSubtext}>
+                Don't miss out on these exotic treasures!
+              </Text>
+            </View>
           </View>
+        </LinearGradient>
+
+        {/* Subtle transition gradient */}
+        <LinearGradient
+          colors={["#0F0B1F", Colors.destiny.dark + "20", Colors.destiny.dark]}
+          style={styles.subtleTransition}
+        />
+
+        {/* Exotic Items Section */}
+        {exoticItems.length > 0 && (
+          <LinearGradient
+            colors={[
+              Colors.destiny.dark,
+              Colors.destiny.dark + "90",
+              Colors.destiny.dark,
+            ]}
+            style={styles.inventorySection}
+          >
+            <Text style={styles.sectionTitle}>Exotic Equipment</Text>
+            <Text style={styles.sectionSubtitle}>
+              {exoticItems.length} item{exoticItems.length > 1 ? "s" : ""}{" "}
+              available
+            </Text>
+            {exoticItems.map((item, index) => (
+              <XurItemCard
+                key={`exotic-${index}`}
+                item={item}
+                onPress={() => handleItemPress(item)}
+              />
+            ))}
+          </LinearGradient>
         )}
-      </View>
-    </ScrollView>
+
+        {/* Special Offers Section */}
+        {specialOffers.length > 0 && (
+          <LinearGradient
+            colors={[
+              Colors.destiny.dark,
+              Colors.destiny.dark + "60",
+              Colors.destiny.dark,
+            ]}
+            style={styles.inventorySection}
+          >
+            <Text style={styles.sectionTitle}>Special Offers</Text>
+            <Text style={styles.sectionSubtitle}>
+              Quests and access to extended offers
+            </Text>
+            {specialOffers.map((item, index) => (
+              <XurItemCard
+                key={`special-${index}`}
+                item={item}
+                onPress={() => handleItemPress(item)}
+              />
+            ))}
+          </LinearGradient>
+        )}
+
+        {/* Stats Section */}
+        <LinearGradient
+          colors={[
+            Colors.destiny.dark,
+            Colors.destiny.dark + "80",
+            Colors.destiny.dark,
+          ]}
+          style={styles.statsSection}
+        >
+          <Text style={styles.sectionTitle}>Statistics</Text>
+          <View style={styles.statsGrid}>
+            <View style={styles.statItem}>
+              <Text style={styles.statNumber}>{saleItems.length}</Text>
+              <Text style={styles.statLabel}>Total items</Text>
+            </View>
+            <View style={styles.statItem}>
+              <Text style={styles.statNumber}>{exoticItems.length}</Text>
+              <Text style={styles.statLabel}>Exotics</Text>
+            </View>
+            <View style={styles.statItem}>
+              <Text style={styles.statNumber}>{specialOffers.length}</Text>
+              <Text style={styles.statLabel}>Special offers</Text>
+            </View>
+          </View>
+        </LinearGradient>
+      </ScrollView>
+
+      {/* Item Detail Modal */}
+      <XurItemModal
+        visible={modalVisible}
+        onClose={closeModal}
+        item={selectedItem}
+      />
+    </>
   );
 }
 
@@ -163,8 +308,8 @@ const styles = StyleSheet.create({
   },
   loadingContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     backgroundColor: Colors.destiny.dark,
   },
   loadingText: {
@@ -174,14 +319,14 @@ const styles = StyleSheet.create({
   },
   errorContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     padding: 24,
-    backgroundColor: 'transparent',
+    backgroundColor: "transparent",
   },
   errorTitle: {
     fontSize: 24,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     color: Colors.destiny.ghost,
     marginTop: 16,
     marginBottom: 8,
@@ -189,7 +334,7 @@ const styles = StyleSheet.create({
   errorText: {
     fontSize: 16,
     color: Colors.destiny.ghost,
-    textAlign: 'center',
+    textAlign: "center",
     opacity: 0.8,
     marginBottom: 24,
   },
@@ -201,46 +346,106 @@ const styles = StyleSheet.create({
   },
   retryButtonText: {
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     color: Colors.destiny.dark,
   },
   countdownSection: {
-    paddingTop: 24,
-    paddingBottom: 32,
+    paddingTop: 40,
+    paddingBottom: 40,
     paddingHorizontal: 24,
-    minHeight: 240,
+    minHeight: 320,
     justifyContent: "center",
   },
   countdownContent: {
     alignItems: "center",
     backgroundColor: "transparent",
   },
+  alienIconContainer: {
+    position: "relative",
+    marginBottom: 20,
+    alignItems: "center",
+    justifyContent: "center",
+  },
   alienIcon: {
-    marginBottom: 16,
-    opacity: 0.9,
+    marginBottom: 0,
+    opacity: 1,
+    zIndex: 2,
+  },
+  alienGlow: {
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    backgroundColor: "#8B5CF6",
+    opacity: 0.25,
+    transform: [{ translateX: -60 }, { translateY: -60 }],
+    zIndex: 1,
   },
   countdownTitle: {
-    fontSize: 24,
+    fontSize: 28,
     fontWeight: "bold",
     color: Colors.destiny.ghost,
     textAlign: "center",
-    marginBottom: 8,
+    marginBottom: 24,
+    letterSpacing: 1,
+  },
+  timeContainer: {
+    marginBottom: 24,
+    position: "relative",
+  },
+  timeCard: {
+    paddingHorizontal: 32,
+    paddingVertical: 16,
+    borderRadius: 20,
+    borderWidth: 2,
+    borderColor: "#8B5CF680",
+    position: "relative",
+    overflow: "hidden",
   },
   countdownTime: {
-    fontSize: 36,
-    fontWeight: "bold",
-    color: Colors.destiny.accent,
+    fontSize: 42,
+    fontWeight: "900",
+    color: "#8B5CF6",
     textAlign: "center",
-    marginBottom: 16,
-    letterSpacing: 2,
+    letterSpacing: 3,
+    textShadowColor: "#8B5CF680",
+    textShadowOffset: { width: 0, height: 0 },
+    textShadowRadius: 10,
+  },
+  timeGlow: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    borderRadius: 18,
+    backgroundColor: "#8B5CF6",
+    opacity: 0.08,
   },
   countdownDescription: {
     fontSize: 16,
     color: Colors.destiny.ghost,
     textAlign: "center",
-    opacity: 0.8,
+    opacity: 0.9,
     paddingHorizontal: 20,
     lineHeight: 24,
+    marginBottom: 20,
+  },
+  decorativeContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "transparent",
+    marginTop: 8,
+  },
+  decorativeLine: {
+    width: 40,
+    height: 1,
+    backgroundColor: "#8B5CF6",
+    opacity: 0.5,
+    marginHorizontal: 12,
   },
   xurPresentSection: {
     paddingTop: 24,
@@ -267,15 +472,77 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginBottom: 4,
   },
+  xurDescription: {
+    fontSize: 16,
+    color: Colors.destiny.ghost,
+    textAlign: "center",
+    marginBottom: 8,
+    marginTop: 8,
+    paddingHorizontal: 20,
+    fontStyle: "italic",
+    opacity: 0.9,
+    lineHeight: 22,
+  },
   timeRemainingText: {
     fontSize: 14,
     color: Colors.destiny.primary,
     textAlign: "center",
     opacity: 0.8,
   },
+  headerSection: {
+    paddingTop: 24,
+    paddingBottom: 32,
+    paddingHorizontal: 24,
+    minHeight: 200,
+    justifyContent: "center",
+  },
+  headerContent: {
+    alignItems: "center",
+    backgroundColor: "transparent",
+  },
+  refreshText: {
+    fontSize: 12,
+    color: Colors.destiny.ghost,
+    textAlign: "center",
+    opacity: 0.6,
+    marginTop: 8,
+  },
+  sectionSubtitle: {
+    fontSize: 14,
+    color: Colors.destiny.ghost,
+    opacity: 0.7,
+    marginBottom: 16,
+    textAlign: "center",
+  },
+  statsSection: {
+    padding: 24,
+    backgroundColor: "transparent",
+  },
+  statsGrid: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    backgroundColor: "transparent",
+  },
+  statItem: {
+    alignItems: "center",
+    backgroundColor: "transparent",
+  },
+  statNumber: {
+    fontSize: 24,
+    fontWeight: "bold",
+    color: Colors.destiny.accent,
+    marginBottom: 4,
+  },
+  statLabel: {
+    fontSize: 12,
+    color: Colors.destiny.ghost,
+    opacity: 0.7,
+    textAlign: "center",
+  },
   inventorySection: {
     padding: 24,
     backgroundColor: "transparent",
+    marginTop: 0, // No overlap for clean separation
   },
   infoSection: {
     padding: 24,
@@ -297,16 +564,16 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   noItemsContainer: {
-    alignItems: 'center',
+    alignItems: "center",
     padding: 32,
-    backgroundColor: 'transparent',
+    backgroundColor: "transparent",
   },
   noItemsText: {
     fontSize: 16,
     color: Colors.destiny.ghost,
     opacity: 0.7,
     marginTop: 16,
-    textAlign: 'center',
+    textAlign: "center",
   },
   // Legacy styles for backward compatibility (can be removed if not used)
   itemCard: {
@@ -345,5 +612,73 @@ const styles = StyleSheet.create({
     color: Colors.destiny.ghost,
     opacity: 0.7,
     lineHeight: 20,
+  },
+
+  // Xur Present Countdown Styles
+  xurPresentIconContainer: {
+    alignItems: "center",
+    position: "relative",
+    marginBottom: 20,
+  },
+  xurPresentGlow: {
+    position: "absolute",
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    backgroundColor: "#8B5CF6",
+    opacity: 0.3,
+    zIndex: -1,
+  },
+  xurPresentCountdownContainer: {
+    alignItems: "center",
+    marginTop: 20,
+    paddingVertical: 16,
+  },
+  xurPresentCountdownLabel: {
+    fontSize: 14,
+    color: Colors.destiny.ghost,
+    marginBottom: 12,
+    fontWeight: "500",
+    opacity: 0.9,
+  },
+  xurPresentTimeCard: {
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    borderRadius: 16,
+    position: "relative",
+    marginBottom: 8,
+    borderWidth: 1,
+    borderColor: "#D4AF3760",
+  },
+  xurPresentCountdownTime: {
+    fontSize: 20,
+    fontWeight: "bold",
+    color: "#D4AF37",
+    textAlign: "center",
+    letterSpacing: 0.5,
+  },
+  xurPresentTimeGlow: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    borderRadius: 16,
+    backgroundColor: "#D4AF37",
+    opacity: 0.12,
+    zIndex: -1,
+  },
+  xurPresentCountdownSubtext: {
+    fontSize: 12,
+    color: Colors.destiny.ghost,
+    opacity: 0.7,
+    textAlign: "center",
+    fontStyle: "italic",
+  },
+
+  // Subtle transition style
+  subtleTransition: {
+    height: 40,
+    backgroundColor: "transparent",
   },
 });
