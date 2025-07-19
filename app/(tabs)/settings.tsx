@@ -2,9 +2,11 @@ import { StyleSheet, ScrollView, TouchableOpacity, Alert } from "react-native";
 import { Text, View } from "@/components/Themed";
 import { MaterialCommunityIcons, Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Colors from "@/constants/Colors";
 
 export default function SettingsScreen() {
+  const insets = useSafeAreaInsets();
   const appVersion = "1.0.0";
   const buildNumber = "2025.1";
 
@@ -97,7 +99,7 @@ export default function SettingsScreen() {
   ];
 
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView style={[styles.container, { paddingTop: insets.top }]}>
       {/* Header */}
       <LinearGradient
         colors={["#0F0F23", "#1E293B", "#0F0F23"]}

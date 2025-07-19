@@ -2,17 +2,19 @@ import { StyleSheet, ScrollView, TouchableOpacity, RefreshControl, ActivityIndic
 import { Text, View } from "@/components/Themed";
 import { MaterialCommunityIcons, Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Colors from "@/constants/Colors";
 import { useXur } from "@/hooks/useXur";
 import XurItemCard from "@/components/XurItemCard";
 
 export default function XurScreen() {
+  const insets = useSafeAreaInsets();
   const { xurData, isLoading, error, isXurPresent, timeUntilXur, refreshXurData } = useXur();
 
   // Show loading state
   if (isLoading) {
     return (
-      <View style={styles.loadingContainer}>
+      <View style={[styles.loadingContainer, { paddingTop: insets.top }]}>
         <ActivityIndicator size="large" color={Colors.destiny.accent} />
         <Text style={styles.loadingText}>Chargement des données de Xûr...</Text>
       </View>
@@ -23,7 +25,7 @@ export default function XurScreen() {
   if (error) {
     return (
       <ScrollView 
-        style={styles.container}
+        style={[styles.container, { paddingTop: insets.top }]}
         refreshControl={
           <RefreshControl
             refreshing={isLoading}
@@ -51,7 +53,7 @@ export default function XurScreen() {
   if (!isXurPresent) {
     return (
       <ScrollView 
-        style={styles.container}
+        style={[styles.container, { paddingTop: insets.top }]}
         refreshControl={
           <RefreshControl
             refreshing={isLoading}
@@ -94,7 +96,7 @@ export default function XurScreen() {
 
   return (
     <ScrollView 
-      style={styles.container}
+      style={[styles.container, { paddingTop: insets.top }]}
       refreshControl={
         <RefreshControl
           refreshing={isLoading}

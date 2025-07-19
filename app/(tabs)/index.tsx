@@ -6,11 +6,14 @@ import {
 import { Text, View } from "@/components/Themed";
 import { FontAwesome6 } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Colors from "@/constants/Colors";
 
 export default function HomeScreen() {
+  const insets = useSafeAreaInsets();
+  
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView style={[styles.container, { paddingTop: insets.top }]}>
       {/* Hero Section */}
       <LinearGradient
         colors={["#0F0F23", "#1E293B", "#0F0F23"]}

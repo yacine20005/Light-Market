@@ -29,7 +29,7 @@ export default function TabLayout() {
       screenOptions={{
         tabBarActiveTintColor: Colors.destiny.primary,
         tabBarInactiveTintColor: Colors.destiny.ghost + "60",
-        headerShown: true,
+        headerShown: false,
         headerTransparent: false,
         headerStyle: {
           backgroundColor: Colors.destiny.dark,
@@ -68,7 +68,7 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="home"
+        name="index"
         options={{
           title: "Home",
           tabBarIcon: ({ color }) => <IonicIcon name="home" color={color} />,
