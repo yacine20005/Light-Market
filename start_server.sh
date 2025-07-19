@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
 
-# Démarrage du serveur
+# Start the FastAPI server with Uvicorn
 uvicorn backend.main:app --reload

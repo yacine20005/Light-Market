@@ -8,10 +8,10 @@ router = APIRouter()
 @router.get("/xur")
 async def get_xur_inventory():
     """
-    Récupère l'inventaire de Xûr avec les items exotiques décodés.
+    Retrieves Xûr's inventory with decoded exotic items.
     
-    Retourne la localisation de Xûr et les items exotiques actuellement en vente
-    avec des informations détaillées incluant noms, descriptions, stats et rareté.
+    Returns Xûr's location and exotic items currently for sale
+    with detailed information including names, descriptions, stats and rarity.
     """
     # Hash de Xûr dans l'API Bungie
     XUR_VENDOR_HASH = "2190858386"
@@ -21,16 +21,16 @@ async def get_xur_inventory():
 
     vendor_data = await bungie_api.make_bungie_request(endpoint, params=params)
     if vendor_data is None:
-        raise HTTPException(status_code=502, detail="Erreur API Bungie en amont")
+        raise HTTPException(status_code=502, detail="Upstream Bungie API error")
 
-    # Vérifier si Xûr est disponible
+    # Check if Xûr is available
     response = vendor_data.get('Response', {})
     vendors = response.get('vendors', {}).get('data', {})
 
     if XUR_VENDOR_HASH not in vendors:
-        raise HTTPException(status_code=404, detail="Xûr n'est pas disponible actuellement")
+        raise HTTPException(status_code=404, detail="Xûr is not currently available")
 
-    # Décoder et filtrer pour Xûr uniquement
+    # Decode and filter for Xûr only
     try:
         decoded_data = manifest_decoder.decode_vendor_data(vendor_data)
 
@@ -47,13 +47,13 @@ async def get_xur_inventory():
         }
 
     except Exception as e:
-        print(f"Erreur lors du décodage des données Xûr: {e}")
-        raise HTTPException(status_code=500, detail="Erreur lors du traitement des données Xûr") from e
+        print(f"Error decoding Xûr data: {e}")
+        raise HTTPException(status_code=500, detail="Error processing Xûr data") from e
 
 @router.get("/xur/debug")
 async def debug_xur_data():
     """
-    Endpoint de debug pour investiguer la structure des données de Xûr.
+    Debug endpoint to investigate Xûr data structure.
     """
     XUR_VENDOR_HASH = "2190858386"
     
@@ -64,11 +64,11 @@ async def debug_xur_data():
     
     vendor_data = await bungie_api.make_bungie_request(endpoint, params=params)
     if not vendor_data:
-        raise HTTPException(status_code=502, detail="Impossible de récupérer les données")
+        raise HTTPException(status_code=502, detail="Unable to retrieve data")
     
     response = vendor_data.get('Response', {})
     
-    # Structure de debug simplifiée
+    # Simplified debug structure
     debug_info = {
         'available_components': list(response.keys()),
         'xur_vendor_exists': XUR_VENDOR_HASH in response.get('vendors', {}).get('data', {}),
@@ -85,7 +85,7 @@ async def debug_xur_data():
             'sale_items_keys': list(xur_sales.get('saleItems', {}).keys())
         }
         
-        # Analyser les items exotiques
+        # Analyze exotic items
         for item_key, item_data in xur_sales.get('saleItems', {}).items():
             item_hash = item_data.get('itemHash')
             item_def = manifest_decoder.get_item_definition(item_hash)
@@ -95,7 +95,7 @@ async def debug_xur_data():
                 tier_type = item_def.get('inventory', {}).get('tierType', 0)
                 rarity = manifest_decoder.get_rarity_name(tier_type)
                 
-                # Garder seulement les exotiques (tierType 6) et les items spéciaux
+                # Keep only exotics (tierType 6) and special items
                 if tier_type == 6 or 'Strange' in item_name or 'Xenology' in item_name:
                     debug_info['exotic_items_analysis'][item_key] = {
                         'name': item_name,

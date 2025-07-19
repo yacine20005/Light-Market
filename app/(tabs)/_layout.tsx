@@ -68,16 +68,16 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="index"
+        name="home"
         options={{
-          title: "Accueil",
+          title: "Home",
           tabBarIcon: ({ color }) => <IonicIcon name="home" color={color} />,
         }}
       />
       <Tabs.Screen
         name="settings"
         options={{
-          title: "Paramètres",
+          title: "Settings",
           tabBarIcon: ({ color }) => (
             <IonicIcon name="settings" color={color} />
           ),

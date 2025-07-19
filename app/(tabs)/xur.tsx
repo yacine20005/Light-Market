@@ -1,17 +1,65 @@
-import { StyleSheet, ScrollView, TouchableOpacity } from "react-native";
+import { StyleSheet, ScrollView, TouchableOpacity, RefreshControl, ActivityIndicator } from "react-native";
 import { Text, View } from "@/components/Themed";
 import { MaterialCommunityIcons, Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import Colors from "@/constants/Colors";
+import { useXur } from "@/hooks/useXur";
+import XurItemCard from "@/components/XurItemCard";
 
 export default function XurScreen() {
-  // Simule si Xûr est présent ou non
-  const isXurPresent = true; // À modifier selon la logique réelle
-  const timeUntilXur = "2j 14h 32m"; // Exemple de compte à rebours
+  const { xurData, isLoading, error, isXurPresent, timeUntilXur, refreshXurData } = useXur();
+
+  // Show loading state
+  if (isLoading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color={Colors.destiny.accent} />
+        <Text style={styles.loadingText}>Chargement des données de Xûr...</Text>
+      </View>
+    );
+  }
+
+  // Show error state
+  if (error) {
+    return (
+      <ScrollView 
+        style={styles.container}
+        refreshControl={
+          <RefreshControl
+            refreshing={isLoading}
+            onRefresh={refreshXurData}
+            tintColor={Colors.destiny.accent}
+          />
+        }
+      >
+        <View style={styles.errorContainer}>
+          <MaterialCommunityIcons
+            name="alert-circle"
+            size={64}
+            color={Colors.destiny.error || "#ef4444"}
+          />
+          <Text style={styles.errorTitle}>Erreur</Text>
+          <Text style={styles.errorText}>{error}</Text>
+          <TouchableOpacity style={styles.retryButton} onPress={refreshXurData}>
+            <Text style={styles.retryButtonText}>Réessayer</Text>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
+    );
+  }
 
   if (!isXurPresent) {
     return (
-      <ScrollView style={styles.container}>
+      <ScrollView 
+        style={styles.container}
+        refreshControl={
+          <RefreshControl
+            refreshing={isLoading}
+            onRefresh={refreshXurData}
+            tintColor={Colors.destiny.accent}
+          />
+        }
+      >
         {/* Countdown Section */}
         <LinearGradient
           colors={["#522F9A", "#1E293B", "#522F9A"]}
@@ -24,20 +72,20 @@ export default function XurScreen() {
               color={Colors.destiny.accent}
               style={styles.alienIcon}
             />
-            <Text style={styles.countdownTitle}>Xûr arrive dans</Text>
+            <Text style={styles.countdownTitle}>Xûr arrives in</Text>
             <Text style={styles.countdownTime}>{timeUntilXur}</Text>
             <Text style={styles.countdownDescription}>
-              L'Agent des Neuf reviendra avec de nouveaux équipements exotiques
+              The Agent of the Nine will return with new exotic equipment
             </Text>
           </View>
         </LinearGradient>
 
         {/* Info Section */}
         <View style={styles.infoSection}>
-          <Text style={styles.sectionTitle}>À propos de Xûr</Text>
+          <Text style={styles.sectionTitle}>About Xûr</Text>
           <Text style={styles.infoText}>
-            Xûr, Agent des Neuf, est un vendeur mystérieux qui apparaît dans
-            Destiny 2 du vendredi 18h00 au mardi 18h00 (heure de Paris).
+            Xûr, Agent of the Nine, is a mysterious vendor who appears in
+            Destiny 2 from Friday 6:00 PM to Tuesday 6:00 PM (Paris time).
           </Text>
         </View>
       </ScrollView>
@@ -45,7 +93,16 @@ export default function XurScreen() {
   }
 
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView 
+      style={styles.container}
+      refreshControl={
+        <RefreshControl
+          refreshing={isLoading}
+          onRefresh={refreshXurData}
+          tintColor={Colors.destiny.accent}
+        />
+      }
+    >
       {/* Xur Present Section */}
       <LinearGradient
         colors={["#522F9A", "#1E293B", "#522F9A"]}
@@ -58,8 +115,8 @@ export default function XurScreen() {
             color={Colors.destiny.accent}
           />
           <Text style={styles.xurPresentTitle}>Xûr est présent !</Text>
-          <Text style={styles.locationText}>📍 Tour de l'EDZ</Text>
-          <Text style={styles.timeRemainingText}>Temps restant: 1j 8h 15m</Text>
+          <Text style={styles.locationText}>📍 Quelque part dans le système</Text>
+          <Text style={styles.timeRemainingText}>Temps restant: {timeUntilXur}</Text>
         </View>
       </LinearGradient>
 
@@ -67,46 +124,30 @@ export default function XurScreen() {
       <View style={styles.inventorySection}>
         <Text style={styles.sectionTitle}>Inventaire de Xûr</Text>
 
-        {/* Exotic Items */}
-        <TouchableOpacity style={styles.itemCard}>
-          <LinearGradient
-            colors={["rgba(251, 191, 36, 0.2)", "rgba(251, 191, 36, 0.05)"]}
-            style={styles.itemGradient}
-          >
-            <View style={styles.itemHeader}>
-              <MaterialCommunityIcons
-                name="shield-star"
-                size={24}
-                color={Colors.destiny.exotic}
-              />
-              <Text style={styles.itemName}>Casque Exotique</Text>
-              <Text style={styles.itemPrice}>23 💎</Text>
-            </View>
-            <Text style={styles.itemDescription}>
-              Casque avec perk unique pour Titans
+        {xurData?.sales?.saleItems ? (
+          Object.entries(xurData.sales.saleItems).map(([key, item]) => (
+            <XurItemCard
+              key={key}
+              item={item}
+              onPress={() => {
+                // TODO: Open item detail modal
+                console.log('Item pressed:', item.name);
+              }}
+            />
+          ))
+        ) : (
+          <View style={styles.noItemsContainer}>
+            <MaterialCommunityIcons
+              name="package-variant"
+              size={48}
+              color={Colors.destiny.primary}
+              style={{ opacity: 0.5 }}
+            />
+            <Text style={styles.noItemsText}>
+              Aucun objet disponible pour le moment
             </Text>
-          </LinearGradient>
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.itemCard}>
-          <LinearGradient
-            colors={["rgba(251, 191, 36, 0.2)", "rgba(251, 191, 36, 0.05)"]}
-            style={styles.itemGradient}
-          >
-            <View style={styles.itemHeader}>
-              <MaterialCommunityIcons
-                name="pistol"
-                size={24}
-                color={Colors.destiny.exotic}
-              />
-              <Text style={styles.itemName}>Arme Exotique</Text>
-              <Text style={styles.itemPrice}>29 💎</Text>
-            </View>
-            <Text style={styles.itemDescription}>
-              Canon à main avec capacités spéciales
-            </Text>
-          </LinearGradient>
-        </TouchableOpacity>
+          </View>
+        )}
       </View>
     </ScrollView>
   );
@@ -117,6 +158,49 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: Colors.destiny.dark,
     paddingBottom: 80,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: Colors.destiny.dark,
+  },
+  loadingText: {
+    fontSize: 16,
+    color: Colors.destiny.ghost,
+    marginTop: 16,
+  },
+  errorContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 24,
+    backgroundColor: 'transparent',
+  },
+  errorTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: Colors.destiny.ghost,
+    marginTop: 16,
+    marginBottom: 8,
+  },
+  errorText: {
+    fontSize: 16,
+    color: Colors.destiny.ghost,
+    textAlign: 'center',
+    opacity: 0.8,
+    marginBottom: 24,
+  },
+  retryButton: {
+    backgroundColor: Colors.destiny.accent,
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    borderRadius: 8,
+  },
+  retryButtonText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: Colors.destiny.dark,
   },
   countdownSection: {
     paddingTop: 24,
@@ -210,6 +294,19 @@ const styles = StyleSheet.create({
     opacity: 0.8,
     textAlign: "center",
   },
+  noItemsContainer: {
+    alignItems: 'center',
+    padding: 32,
+    backgroundColor: 'transparent',
+  },
+  noItemsText: {
+    fontSize: 16,
+    color: Colors.destiny.ghost,
+    opacity: 0.7,
+    marginTop: 16,
+    textAlign: 'center',
+  },
+  // Legacy styles for backward compatibility (can be removed if not used)
   itemCard: {
     marginBottom: 16,
     borderRadius: 16,

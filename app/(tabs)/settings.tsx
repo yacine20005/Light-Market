@@ -9,22 +9,22 @@ export default function SettingsScreen() {
   const buildNumber = "2025.1";
 
   const handleNotificationSettings = () => {
-    Alert.alert("Notifications", "Configuration des notifications");
+    Alert.alert("Notifications", "Notification settings");
   };
 
   const handleThemeSettings = () => {
-    Alert.alert("Thème", "Paramètres d'apparence");
+    Alert.alert("Theme", "Appearance settings");
   };
 
   const handleAbout = () => {
     Alert.alert(
-      "À propos",
-      `Light Market v${appVersion}\nBuild ${buildNumber}\n\nApplication pour consulter les vendeurs de Destiny 2`
+      "About",
+      `Light Market v${appVersion}\nBuild ${buildNumber}\n\nApplication to check Destiny 2 vendors`
     );
   };
 
   const handleFeedback = () => {
-    Alert.alert("Feedback", "Envoi de commentaires");
+    Alert.alert("Feedback", "Sending feedback");
   };
 
   interface SettingsOption {
@@ -41,23 +41,23 @@ export default function SettingsScreen() {
     {
       id: "notifications",
       title: "Notifications",
-      description: "Alertes pour les nouveaux inventaires",
+      description: "Alerts for new inventories",
       icon: "bell",
       onPress: handleNotificationSettings,
       showArrow: true,
     },
     {
       id: "theme",
-      title: "Thème",
-      description: "Apparence de l'application",
+      title: "Theme",
+      description: "Application appearance",
       icon: "palette",
       onPress: handleThemeSettings,
       showArrow: true,
     },
     {
       id: "auto-refresh",
-      title: "Actualisation auto",
-      description: "Mise à jour automatique des données",
+      title: "Auto refresh",
+      description: "Automatic data update",
       icon: "refresh",
       onPress: () => {},
       showToggle: true,
@@ -65,9 +65,9 @@ export default function SettingsScreen() {
     {
       id: "cache",
       title: "Cache",
-      description: "Vider le cache de l'application",
+      description: "Clear application cache",
       icon: "database",
-      onPress: () => Alert.alert("Cache", "Cache vidé avec succès"),
+      onPress: () => Alert.alert("Cache", "Cache cleared successfully"),
       showArrow: true,
     },
   ];
@@ -83,16 +83,16 @@ export default function SettingsScreen() {
     {
       id: "feedback",
       title: "Feedback",
-      description: "Signaler un bug ou suggérer une amélioration",
+      description: "Send your feedback",
       icon: "message-text",
       onPress: handleFeedback,
     },
     {
       id: "rate",
-      title: "Évaluer l'app",
-      description: "Laissez votre avis sur l'App Store",
+      title: "Rate the app",
+      description: "Leave your review on the App Store",
       icon: "star",
-      onPress: () => Alert.alert("Évaluation", "Redirection vers l'App Store"),
+      onPress: () => Alert.alert("Rating", "Redirecting to the App Store"),
     },
   ];
 
@@ -109,16 +109,16 @@ export default function SettingsScreen() {
             size={48}
             color={Colors.destiny.primary}
           />
-          <Text style={styles.headerTitle}>Paramètres</Text>
+          <Text style={styles.headerTitle}>Settings</Text>
           <Text style={styles.headerSubtitle}>
-            Configuration de Light Market
+            Light Market Configuration
           </Text>
         </View>
       </LinearGradient>
 
       {/* Settings Section */}
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Paramètres</Text>
+        <Text style={styles.sectionTitle}>Parameters</Text>
 
         {settingsOptions.map((option) => (
           <TouchableOpacity
@@ -163,7 +163,7 @@ export default function SettingsScreen() {
 
       {/* About Section */}
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>À propos</Text>
+        <Text style={styles.sectionTitle}>About</Text>
 
         {aboutOptions.map((option) => (
           <TouchableOpacity
@@ -202,7 +202,7 @@ export default function SettingsScreen() {
           color={Colors.destiny.primary}
         />
         <Text style={styles.footerText}>
-          Light Market • Créé pour les Gardiens
+          Light Market • Created for Guardians
         </Text>
       </View>
     </ScrollView>

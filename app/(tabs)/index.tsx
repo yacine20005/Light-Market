@@ -20,8 +20,8 @@ export default function HomeScreen() {
           <Text style={styles.title}>Light Market</Text>
           <Text style={styles.subtitle}>Vendor Checker</Text>
           <Text style={styles.description}>
-            Consultez les inventaires des vendeurs en temps réel et trouvez les
-            meilleurs équipements pour votre Gardien.
+            Check vendor inventories in real time and find the
+            best equipment for your Guardian.
           </Text>
         </View>
       </LinearGradient>
@@ -30,7 +30,7 @@ export default function HomeScreen() {
       <View style={styles.footer}>
         <FontAwesome6 name="ghost" size={20} color={Colors.destiny.primary} />
         <Text style={styles.footerText}>
-          Que la Lumière vous guide, Gardien
+          Light Market • Created for Guardians
         </Text>
       </View>
     </ScrollView>
@@ -41,7 +41,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: Colors.destiny.dark,
-    paddingBottom: 80, // Espace pour les tabs
+    paddingBottom: 80, // Space for tabs
   },
   heroSection: {
     paddingTop: 24,
