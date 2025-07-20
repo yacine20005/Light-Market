@@ -26,7 +26,7 @@ else
 fi
 echo -e "${GREEN}✅ Fichier .env mis à jour avec l'IP: ${LOCAL_IP}${NC}"
 
-echo -e "${BLUE}🚀 Démarrage de Light Market${NC}"
+echo -e "${BLUE}🚀 Démarrage de Orbit Market${NC}"
 
 # Fonction pour nettoyer les processus existants
 cleanup_existing_processes() {

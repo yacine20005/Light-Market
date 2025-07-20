@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo "🚀 Configuration de l'environnement Light Market..."
+echo "🚀 Configuration de l'environnement Orbit Market..."
 
 # Vérifier si Python est installé
 if ! command -v python3 &> /dev/null; then

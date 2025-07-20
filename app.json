@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "light-market",
-    "slug": "light-market",
+    "name": "orbit-market",
+    "slug": "orbit-market",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "light-market",
+    "scheme": "orbit-market",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "splash": {

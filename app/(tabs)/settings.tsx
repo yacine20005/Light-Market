@@ -21,7 +21,7 @@ export default function SettingsScreen() {
   const handleAbout = () => {
     Alert.alert(
       "About",
-      `Light Market v${appVersion}\nBuild ${buildNumber}\n\nApplication to check Destiny 2 vendors`
+      `Orbit Market v${appVersion}\nBuild ${buildNumber}\n\nApplication to check vendors accross different games`
     );
   };
 
@@ -112,9 +112,7 @@ export default function SettingsScreen() {
             color={Colors.destiny.primary}
           />
           <Text style={styles.headerTitle}>Settings</Text>
-          <Text style={styles.headerSubtitle}>
-            Light Market Configuration
-          </Text>
+          <Text style={styles.headerSubtitle}>Orbit Market Configuration</Text>
         </View>
       </LinearGradient>
 
@@ -204,7 +202,7 @@ export default function SettingsScreen() {
           color={Colors.destiny.primary}
         />
         <Text style={styles.footerText}>
-          Light Market • Created for Guardians
+          Orbit Market • Created for Guardians
         </Text>
       </View>
     </ScrollView>

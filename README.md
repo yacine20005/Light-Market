@@ -1,22 +1,36 @@
-# 🚀 Destiny 2 Xur Inventory Checker (Expo + FastAPI) 🌌
+# 🚀 Orbit Market - Multi-Game Vendor & World State Tracker 🌌
+
+**Your Ultimate Hub for Destiny 2 & Warframe Live Data**
 
 ----
 
 ## 🌟 About the Project
 
-This project is a **mobile application** designed to be a **"Xur Inventory Checker"** for the popular game **Destiny 2**. Built with **Expo (React Native)** for the frontend and **FastAPI (Python)** for the backend, its main purpose is to give Destiny 2 Guardians a quick and intuitive way to see what **Xûr** is selling.
+**Orbit Market** is a **cross-platform mobile application** that serves as your ultimate companion for **Destiny 2** and **Warframe**. Built with **Expo (React Native)** for the frontend and **FastAPI (Python)** for the backend, this application provides real-time access to vendor inventories, world states, and essential game information across both games.
 
-A central feature of this application is its ability to **decode and clearly display the "rolls" (random perks)** on weapons and armor. This means no more needing to log into the game or check external websites just to find out if Xur has that perfect gear piece!
+### 🎯 **Current Features (Destiny 2):**
+- ✅ **Xûr Inventory Tracker** - Fully functional and live!
+- 🔧 **All Destiny 2 Vendors** - Coming soon!
+
+### 🌟 **Upcoming Features (Warframe):**
+- 🌍 **World State Information** - Real-time Warframe world data
+- 📊 **Market Data & More** - Comprehensive Warframe ecosystem tracking
 
 ----
 
-## ✨ Core Features
+## ✨ Current Features
 
-* **Real-time Xur Inventory:** See what Xûr is offering right now.
-* **Detailed Item Information:** View names, icons, and base stats for all items.
-* **"Roll" Decryption:** Understand the specific perks and stats on weapons and armor, a crucial aspect for optimal gameplay.
-* **Cost Breakdown:** Easily see the materials and currency required for each purchase.
-* **Automatic Data Refresh:** Xur's inventory is automatically updated following his weekly arrival.
+### 🔮 **Destiny 2 - Xûr Tracker (Live!)**
+* **Real-time Xur Inventory:** See what Xûr is offering right now
+* **Detailed Item Information:** View names, icons, and base stats for all items
+* **"Roll" Decryption:** Understand the specific perks and stats on weapons and armor
+* **Cost Breakdown:** Easily see the materials and currency required for each purchase
+* **Automatic Data Refresh:** Xur's inventory updates automatically with his weekly arrival
+
+### 🚀 **Coming Soon**
+* **All Destiny 2 Vendors:** Ada-1, Banshee-44, Saint-14, and more!
+* **Warframe World State:** Invasions, Alerts, Sorties, Nightwave, and current events
+* **Cross-Game Dashboard:** Switch seamlessly between Destiny 2 and Warframe data
 
 ----
 
@@ -29,62 +43,81 @@ A central feature of this application is its ability to **decode and clearly dis
 
 ### Backend (API)
 
-* **FastAPI (Python):** A modern, high-performance web framework for building the API.
-* **Pydantic:** Used for powerful data validation and modeling within FastAPI.
-* **`requests` (Python):** For secure and reliable external API calls (e.g., to Bungie.net).
+- **FastAPI (Python):** A modern, high-performance web framework for building the API
+- **Pydantic:** Used for powerful data validation and modeling within FastAPI
+- **SQLite:** Local database for storing Destiny 2 Manifest data
+- **External APIs Integration:**
+  - **Bungie.net API:** For Destiny 2 vendor and game data
+  - **Warframe WorldState API:** For real-time Warframe information
 
 ----
 
-## 💡 My Project Goals & Ambition
+## 💡 Project Vision & Goals
 
-This project is more than just a utility for Destiny 2; it's a significant milestone in my personal learning journey and my pursuit of an apprenticeship/alternance. My key objectives for this endeavor are:
+This project represents an ambitious expansion from a single-game utility to a **comprehensive multi-game information hub**. My objectives include:
 
-1. **FastAPI Proficiency:** To gain hands-on expertise with FastAPI, focusing on its performance, automatic documentation, and best practices for building scalable APIs.
-2. **Practical Mobile Development:** To deepen my skills in mobile application development using Expo and React Native, tackling real-world challenges in cross-platform UI and state management.
-3. **Complex Data Handling:** To master the process of downloading, storing, and querying the **Bungie Manifest API** – a large and intricate SQLite database. This involves transforming raw game data into meaningful, user-friendly information.
-4. **Client-Server Architecture:** To design and implement a robust client-server architecture, ensuring seamless communication between the mobile app and the dedicated backend.
-5. **Portfolio Enhancement:** To create a tangible, functional, and highly practical project that showcases my technical abilities and problem-solving skills to prospective employers as I seek an apprenticeship opportunity.
+1. **Multi-Game Architecture:** Design a scalable backend capable of handling multiple game APIs and data sources
+2. **Real-Time Data Processing:** Implement efficient systems for live data updates from both Destiny 2 and Warframe
+3. **Advanced Mobile Development:** Master complex state management across different game contexts and data types
+4. **API Design Excellence:** Create robust, well-documented APIs that can serve multiple frontend applications
+5. **Performance Optimization:** Handle large datasets (Destiny 2 Manifest) while maintaining fast response times
+6. **Portfolio Showcase:** Demonstrate full-stack capabilities and multi-platform integration skills
+
+### 🎮 **Game Coverage Strategy**
+
+**Phase 1 (Current):** Destiny 2 Xûr - ✅ **LIVE**
+**Phase 2 (In Progress):** All Destiny 2 Vendors
+**Phase 3 (Planned):** Warframe World State Integration
+**Phase 4 (Future):** Enhanced Features & Additional Games
 
 ----
 
 ## 🏗️ Architecture Overview
 
-The application adopts a standard client-server architecture to ensure efficiency and a smooth user experience:
+The application uses a **multi-game client-server architecture** designed for scalability and performance:
 
 ```text
-+-------------------+           +-----------------------+           +-----------------------+
-|                   |           |                       |           |                       |
-|   Mobile App      |           |        Backend        |           |        Bungie API     |
-|   (Expo)          | <-------> |       (FastAPI)       | <-------> |       (Public)        |
-|                   |           |                       |           |                       |
-+-------------------+           +-----------------------+           +-----------------------+
++-------------------+           +-----------------------+           +-------------------------+
+|                   |           |                       |           |                         |
+|   Mobile App      |           |     Backend API       |           |     External APIs       |
+|   (Expo React     | <-------> |     (FastAPI)         | <-------> |                         |
+|    Native)        |           |                       |           |  • Bungie.net API      |
+|                   |           |                       |           |  • Warframe API         |
++-------------------+           +-----------------------+           +-------------------------+
         |                                   |                                   |
-        |  - Displays User Interface        |  - Manages Manifest updates       |  - Provides Vendor/Game Data
-        |  - Requests Data from Backend     |  - Queries and decodes Manifest    |
-        |                                   |  - Serves formatted data to app   |
+        |  • Cross-game UI                  |  • Multi-game routing             |  • Real-time data
+        |  • State management               |  • Data processing                |  • Vendor inventories
+        |  • Real-time updates              |  • Manifest management            |  • World states
+        |                                   |                                   |
         |                                   +-----------------------+
         |                                               |
-        |                                               |
-        |                                               |
-        +-----------------------------------------------+
-                                |
-                                |
-                +---------------------------------+
-                |   Local Manifest Database       |
-                |   (SQLite) - On Server Side     |
-                +---------------------------------+
+        |                                   +-----------------------+
+        |                                   |  Local Databases       |
+        +-----------------------------------+  • Destiny 2 Manifest  |
+                                            |  • Cached Game Data    |
+                                            +-----------------------+
 ```
 
-The **FastAPI backend** is central to this design. It acts as both a proxy and a decoder for the Destiny 2 Manifest. This approach means the Expo mobile application doesn't need to handle the heavy task of downloading and querying the large Manifest file, which significantly optimizes the app's performance and data usage for the end-user.
+### 🔧 **Key Architectural Decisions:**
+- **Centralized Data Processing:** Heavy manifest operations handled server-side
+- **Optimized Mobile Performance:** Lightweight client with efficient data consumption
+- **Modular Game Integration:** Easy addition of new games and APIs
+- **Real-Time Sync:** Live updates for time-sensitive vendor rotations
 
 ----
 
-## 🔮 Future Enhancements
+## 🔮 Roadmap & Future Enhancements
 
-* **Advanced Manifest Management:** Implementing a more sophisticated system for robust, automated Manifest updates on the backend.
-* **Enhanced "Roll" Details:** Further refining the display of perks and stats for ultimate clarity and user benefit.
-* **UI/UX Refinement:** Continuous improvement of the application's design for an even more intuitive and visually appealing experience.
-* **Backend Deployment:** Deploying the FastAPI backend to a cloud service to make the application globally accessible.
+### 🎯 **Immediate Goals**
+- **Complete Destiny 2 Vendor Coverage:** Ada-1, Banshee-44, Saint-14, Trials, Iron Banner
+- **Warframe Integration:** World State API implementation
+- **Enhanced UI/UX:** Game-specific themes and improved navigation
+
+### 🚀 **Long-term Vision**
+- **Additional Games:** Potential expansion to other live-service games
+- **Community Features:** User favorites, notifications, sharing
+- **Advanced Analytics:** Vendor rotation patterns, price tracking
+- **Cloud Deployment:** Global accessibility and scalability
 
 ----
 

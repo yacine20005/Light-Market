@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from .routers import xur
 
 app = FastAPI(
-    title="Light Market API",
+    title="Orbit Market API",
     description="API pour récupérer les données des vendeurs de Destiny 2",
     version="1.0.0"
 )
@@ -40,6 +40,6 @@ def health_check():
     """
     return {
         "status": "healthy",
-        "message": "Light Market API is running",
+        "message": "Orbit Market API is running",
         "version": "1.0.0"
     }

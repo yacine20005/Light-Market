@@ -1,8 +1,4 @@
-import {
-  StyleSheet,
-  ScrollView,
-  Platform,
-} from "react-native";
+import { StyleSheet, ScrollView, Platform } from "react-native";
 import { Text, View } from "@/components/Themed";
 import { FontAwesome6 } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
@@ -11,7 +7,7 @@ import Colors from "@/constants/Colors";
 
 export default function HomeScreen() {
   const insets = useSafeAreaInsets();
-  
+
   return (
     <ScrollView style={[styles.container, { paddingTop: insets.top }]}>
       {/* Hero Section */}
@@ -20,11 +16,11 @@ export default function HomeScreen() {
         style={styles.heroSection}
       >
         <View style={styles.heroContent}>
-          <Text style={styles.title}>Light Market</Text>
+          <Text style={styles.title}>Orbit Market</Text>
           <Text style={styles.subtitle}>Vendor Checker</Text>
           <Text style={styles.description}>
-            Check vendor inventories in real time and find the
-            best equipment for your Guardian.
+            Check vendor inventories in real time and find the best equipment
+            for your Guardian.
           </Text>
         </View>
       </LinearGradient>
@@ -33,7 +29,7 @@ export default function HomeScreen() {
       <View style={styles.footer}>
         <FontAwesome6 name="ghost" size={20} color={Colors.destiny.primary} />
         <Text style={styles.footerText}>
-          Light Market • Created for Guardians
+          Orbit Market • Created by yacine20005
         </Text>
       </View>
     </ScrollView>
