@@ -124,7 +124,7 @@ The application uses a **multi-game client-server architecture** designed for sc
 - **Additional Games:** Potential expansion to other live-service games
 - **Community Features:** User favorites, notifications, sharing
 - **Advanced Analytics:** Vendor rotation patterns, price tracking
-- **Cloud Deployment:** Global accessibility and scalability
+- **Cloud Deployment:** Global accessibility and scalability 
 
 ----
 
