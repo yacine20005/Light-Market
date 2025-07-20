@@ -46,3 +46,4 @@ manifest/
 # venv
 .venv/
 
+.vercel
