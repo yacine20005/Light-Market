@@ -7,10 +7,72 @@ YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
-API_URL="http://192.168.1.112:8000"
+# Détecter l'IP locale automatiquement
+LOCAL_IP=$(hostname -I | awk '{print $1}')
+API_URL="http://${LOCAL_IP}:8000"
 HEALTH_ENDPOINT="/health"
 
+echo -e "${BLUE}🌐 IP détectée: ${LOCAL_IP}${NC}"
+echo -e "${BLUE}🔗 API URL: ${API_URL}${NC}"
+
+# Mettre à jour le fichier .env avec l'IP détectée
+echo -e "${YELLOW}📝 Mise à jour du fichier .env...${NC}"
+if grep -q "EXPO_PUBLIC_API_URL" .env; then
+    sed -i "s|EXPO_PUBLIC_API_URL=.*|EXPO_PUBLIC_API_URL=${API_URL}|" .env
+else
+    echo "" >> .env
+    echo "# Configuration de l'API pour l'application mobile" >> .env
+    echo "EXPO_PUBLIC_API_URL=${API_URL}" >> .env
+fi
+echo -e "${GREEN}✅ Fichier .env mis à jour avec l'IP: ${LOCAL_IP}${NC}"
+
 echo -e "${BLUE}🚀 Démarrage de Light Market${NC}"
+
+# Fonction pour nettoyer les processus existants
+cleanup_existing_processes() {
+    echo -e "${YELLOW}🧹 Nettoyage des processus existants...${NC}"
+    
+    # Tuer les processus utilisant le port 8000 (backend)
+    local backend_pids=$(lsof -ti:8000 2>/dev/null)
+    if [ ! -z "$backend_pids" ]; then
+        echo -e "${YELLOW}⚡ Arrêt des processus backend existants: $backend_pids${NC}"
+        kill -9 $backend_pids 2>/dev/null
+        sleep 1
+    fi
+    
+    # Tuer les processus utilisant le port 8081 (Expo)
+    local expo_pids=$(lsof -ti:8081 2>/dev/null)
+    if [ ! -z "$expo_pids" ]; then
+        echo -e "${YELLOW}⚡ Arrêt des processus Expo existants: $expo_pids${NC}"
+        kill -9 $expo_pids 2>/dev/null
+        sleep 1
+    fi
+    
+    # Tuer les processus uvicorn spécifiquement
+    local uvicorn_pids=$(pgrep -f "uvicorn.*backend.main" 2>/dev/null)
+    if [ ! -z "$uvicorn_pids" ]; then
+        echo -e "${YELLOW}⚡ Arrêt des processus uvicorn existants: $uvicorn_pids${NC}"
+        kill -9 $uvicorn_pids 2>/dev/null
+        sleep 1
+    fi
+    
+    echo -e "${GREEN}✅ Nettoyage terminé${NC}"
+}
+
+# Fonction pour gérer l'arrêt propre
+cleanup_on_exit() {
+    echo -e "\n${YELLOW}🛑 Arrêt en cours...${NC}"
+    if [ ! -z "$backend_pid" ]; then
+        echo -e "${YELLOW}⚡ Arrêt du backend (PID: $backend_pid)...${NC}"
+        kill $backend_pid 2>/dev/null
+    fi
+    cleanup_existing_processes
+    echo -e "${GREEN}👋 Au revoir !${NC}"
+    exit 0
+}
+
+# Capturer les signaux d'arrêt
+trap cleanup_on_exit SIGINT SIGTERM
 
 # Fonction pour vérifier si le serveur backend est démarré
 check_backend() {
@@ -80,6 +142,7 @@ echo -e "${GREEN}✅ Prérequis OK${NC}"
 case "${1:-help}" in
     "backend")
         echo -e "${BLUE}🖥️  Démarrage du backend uniquement...${NC}"
+        cleanup_existing_processes
         chmod +x start_server.sh
         ./start_server.sh
         ;;
@@ -98,6 +161,9 @@ case "${1:-help}" in
         ;;
     "full"|"")
         echo -e "${BLUE}🔄 Démarrage complet (backend + frontend)...${NC}"
+        
+        # Nettoyer les processus existants
+        cleanup_existing_processes
         
         # Démarrer le backend en arrière-plan
         echo -e "${YELLOW}📡 Démarrage du backend...${NC}"
