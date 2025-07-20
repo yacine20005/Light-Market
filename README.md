@@ -25,7 +25,6 @@
 ### 🔮 **Destiny 2 - Xûr Tracker (Live!)**
 
 - **Real-time Xur Inventory:** See what Xûr is offering right now
-
 - **Detailed Item Information:** View names, icons, and base stats for all items
 - **"Roll" Decryption:** Understand the specific perks and stats on weapons and armor
 - **Cost Breakdown:** Easily see the materials and currency required for each purchase
@@ -34,7 +33,6 @@
 ### 🚀 **Coming Soon**
 
 - **All Destiny 2 Vendors:** Ada-1, Banshee-44, Saint-14, and more!
-
 - **Warframe World State:** Invasions, Alerts, Sorties, Nightwave, and current events
 - **Cross-Game Dashboard:** Switch seamlessly between Destiny 2 and Warframe data
 
