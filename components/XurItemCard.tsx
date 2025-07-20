@@ -23,6 +23,13 @@ interface XurItemCardProps {
     quantity: number;
     classType?: number;
     supportedClasses?: string[];
+    perks?: Array<{
+      hash: number;
+      name: string;
+      description: string;
+      icon: string;
+      isExotic?: boolean;
+    }>;
   };
   onPress: () => void;
 }
@@ -141,10 +148,27 @@ export default function XurItemCard({ item, onPress }: XurItemCardProps) {
             </View>
           </View>
 
+          {/* Exotic Perk Preview */}
+          {item.perks &&
+            item.perks.length > 0 &&
+            item.rarity.toLowerCase() === "exotic" && (
+              <View style={styles.exoticPerkPreview}>
+                {item.perks
+                  .filter((perk) => perk.isExotic)
+                  .map((perk, index) => (
+                    <View key={index} style={styles.exoticPerkInfo}>
+                      <Text style={styles.exoticPerkName} numberOfLines={1}>
+                        ⚡ {perk.name}
+                      </Text>
+                    </View>
+                  ))}
+              </View>
+            )}
+
           {/* Classes supportées */}
           {item.supportedClasses && item.supportedClasses.length > 0 && (
             <View style={styles.classesContainer}>
-              <Text style={styles.classesLabel}>Disponible pour:</Text>
+              <Text style={styles.classesLabel}>Available for:</Text>
               <View style={styles.classBadges}>
                 {item.supportedClasses.map((className, index) => (
                   <View
@@ -378,5 +402,42 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: "transparent",
+  },
+  exoticPerkPreview: {
+    backgroundColor: `${Colors.destiny.exotic}08`,
+    borderRadius: 8,
+    padding: 8,
+    marginBottom: 8,
+    borderLeftWidth: 3,
+    borderLeftColor: Colors.destiny.exotic,
+  },
+  exoticPerkHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 4,
+    backgroundColor: "transparent",
+    gap: 4,
+  },
+  exoticPerkLabel: {
+    fontSize: 10,
+    color: Colors.destiny.exotic,
+    fontWeight: "bold",
+    textTransform: "uppercase",
+    letterSpacing: 0.5,
+  },
+  exoticPerkInfo: {
+    backgroundColor: "transparent",
+  },
+  exoticPerkName: {
+    fontSize: 12,
+    color: Colors.destiny.exotic,
+    fontWeight: "bold",
+    marginBottom: 2,
+  },
+  exoticPerkDescription: {
+    fontSize: 10,
+    color: Colors.destiny.ghost,
+    opacity: 0.8,
+    lineHeight: 14,
   },
 });

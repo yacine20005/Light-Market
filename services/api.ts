@@ -3,6 +3,16 @@ const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:8000';
 
 console.log('🌐 API_BASE_URL:', API_BASE_URL);
 
+export interface ItemPerk {
+  hash: number;
+  name: string;
+  description: string;
+  icon: string;
+  isDefault?: boolean;
+  isEquipped?: boolean;
+  isExotic?: boolean;
+}
+
 export interface XurInventoryItem {
   vendorItemIndex: number;
   itemHash: number;
@@ -16,6 +26,10 @@ export interface XurInventoryItem {
   itemDescription: string;
   itemIcon: string;
   rarity: string;
+  classType: number;
+  supportedClasses: string[];
+  flavorText: string;
+  perks: ItemPerk[];
 }
 
 export interface XurData {

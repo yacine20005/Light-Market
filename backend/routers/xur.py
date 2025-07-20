@@ -16,7 +16,7 @@ async def get_xur_inventory():
     # Hash de Xûr dans l'API Bungie
     XUR_VENDOR_HASH = "2190858386"
 
-    params = {"components": "Vendors,VendorSales,ItemSockets,ItemCommonData,ItemStats"}
+    params = {"components": "Vendors,VendorSales,ItemSockets,ItemCommonData,ItemStats,ItemInstances,ItemPerks,ItemPlugStates"}
     endpoint = "/Destiny2/Vendors/"
 
     vendor_data = await bungie_api.make_bungie_request(endpoint, params=params)
@@ -58,7 +58,7 @@ async def debug_xur_data():
     XUR_VENDOR_HASH = "2190858386"
     
     params = {
-        "components": "Vendors,VendorSales,VendorCategories,ItemSockets,ItemCommonData,ItemStats"
+        "components": "Vendors,VendorSales,VendorCategories,ItemSockets,ItemCommonData,ItemStats,ItemInstances,ItemPerks,ItemPlugStates"
     }
     endpoint = "/Destiny2/Vendors/"
     

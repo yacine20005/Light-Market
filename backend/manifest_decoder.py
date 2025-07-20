@@ -50,6 +50,176 @@ class ManifestDecoder:
         """Retrieves an item definition."""
         return self.get_definition("DestinyInventoryItemDefinition", item_hash)
 
+    def get_stat_definition(self, stat_hash):
+        """Retrieves a stat definition."""
+        return self.get_definition("DestinyStatDefinition", stat_hash)
+
+    def get_socket_type_definition(self, socket_type_hash):
+        """Retrieves a socket type definition."""
+        return self.get_definition("DestinySocketTypeDefinition", socket_type_hash)
+
+    def get_plug_definition(self, plug_hash):
+        """Retrieves a plug definition (for perks, mods, etc.)."""
+        return self.get_definition("DestinyInventoryItemDefinition", plug_hash)
+
+    def get_damage_type_definition(self, damage_type_hash):
+        """Retrieves a damage type definition."""
+        return self.get_definition("DestinyDamageTypeDefinition", damage_type_hash)
+
+    def get_item_detailed_info(self, item_hash, item_instance_data=None, sockets_data=None, stats_data=None):
+        """
+        Récupère toutes les informations détaillées d'un objet.
+        
+        Args:
+            item_hash: Hash de l'objet
+            item_instance_data: Données d'instance de l'objet (optionnel)
+            sockets_data: Données des sockets (optionnel)
+            stats_data: Données des stats (optionnel)
+            
+        Returns:
+            Dict avec toutes les informations détaillées de l'objet
+        """
+        item_def = self.get_item_definition(item_hash)
+        if not item_def:
+            return None
+
+        detailed_info = {
+            'hash': item_hash,
+            'displayProperties': item_def.get('displayProperties', {}),
+            'itemType': item_def.get('itemType'),
+            'itemSubType': item_def.get('itemSubType'),
+            'classType': item_def.get('classType'),
+            'rarity': self.get_rarity_name(item_def.get('inventory', {}).get('tierType', 0)),
+            'supportedClasses': self.get_supported_classes(item_def),
+            'flavorText': item_def.get('flavorText', ''),
+            'stats': {},
+            'sockets': [],
+            'perks': [],
+            'mods': [],
+            'damageType': None,
+            'ammoType': item_def.get('equippingBlock', {}).get('ammoType', 0),
+            'powerLevel': None,
+            'investmentStats': []
+        }
+
+        # Informations sur le type de dégâts
+        damage_type_hash = item_def.get('defaultDamageTypeHash')
+        if damage_type_hash:
+            damage_type_def = self.get_damage_type_definition(damage_type_hash)
+            if damage_type_def:
+                detailed_info['damageType'] = {
+                    'hash': damage_type_hash,
+                    'name': damage_type_def.get('displayProperties', {}).get('name', ''),
+                    'icon': damage_type_def.get('displayProperties', {}).get('icon', ''),
+                    'color': damage_type_def.get('color', {})
+                }
+
+        # Stats de base de l'objet (définition)
+        if 'stats' in item_def and 'stats' in item_def['stats']:
+            for stat_hash, stat_value in item_def['stats']['stats'].items():
+                stat_def = self.get_stat_definition(int(stat_hash))
+                if stat_def:
+                    detailed_info['stats'][stat_hash] = {
+                        'hash': stat_hash,
+                        'name': stat_def.get('displayProperties', {}).get('name', ''),
+                        'description': stat_def.get('displayProperties', {}).get('description', ''),
+                        'icon': stat_def.get('displayProperties', {}).get('icon', ''),
+                        'value': stat_value.get('value', 0),
+                        'maximum': stat_value.get('maximum', 100)
+                    }
+
+        # Stats d'investissement (pour le niveau de puissance notamment)
+        if 'investmentStats' in item_def:
+            for stat in item_def['investmentStats']:
+                stat_def = self.get_stat_definition(stat.get('statTypeHash'))
+                if stat_def:
+                    detailed_info['investmentStats'].append({
+                        'hash': stat.get('statTypeHash'),
+                        'name': stat_def.get('displayProperties', {}).get('name', ''),
+                        'value': stat.get('value', 0)
+                    })
+
+        # Récupérer tous les sockets si des sockets d'instance sont fournis
+        if sockets_data and 'sockets' in sockets_data:
+            sockets_list = sockets_data['sockets']
+            for socket in sockets_list:
+                if 'plugHash' in socket:
+                    plug_hash = socket['plugHash']
+                    plug_def = self.get_plug_definition(plug_hash)
+                    if plug_def:
+                        plug_name = plug_def.get('displayProperties', {}).get('name', '')
+                        if plug_name:  # Ne pas traiter les plugs sans nom
+                            plug_info = {
+                                'hash': plug_hash,
+                                'name': plug_name,
+                                'description': plug_def.get('displayProperties', {}).get('description', ''),
+                                'icon': plug_def.get('displayProperties', {}).get('icon', ''),
+                                'isEquipped': socket.get('isEnabled', False),
+                                'isExotic': plug_def.get('inventory', {}).get('tierType', 0) == 6,
+                                'itemType': plug_def.get('itemType', 0),
+                                'itemSubType': plug_def.get('itemSubType', 0)
+                            }
+                            detailed_info['sockets'].append(plug_info)
+                            detailed_info['perks'].append(plug_info)
+
+        # Si pas de socket data mais que l'objet a des sockets dans sa définition, les récupérer
+        if not sockets_data and 'sockets' in item_def:
+            sockets_def = item_def.get('sockets')
+            if sockets_def:
+                socket_entries = sockets_def.get('socketEntries', [])
+                for socket_entry in socket_entries:
+                    # Récupérer le plug par défaut
+                    default_plug_hash = socket_entry.get('singleInitialItemHash')
+                    if default_plug_hash:
+                        plug_def = self.get_plug_definition(default_plug_hash)
+                        if plug_def:
+                            plug_name = plug_def.get('displayProperties', {}).get('name', '')
+                            if plug_name:  # Ne pas traiter les plugs sans nom
+                                plug_info = {
+                                    'hash': default_plug_hash,
+                                    'name': plug_name,
+                                    'description': plug_def.get('displayProperties', {}).get('description', ''),
+                                    'icon': plug_def.get('displayProperties', {}).get('icon', ''),
+                                    'isEquipped': True,
+                                    'isExotic': plug_def.get('inventory', {}).get('tierType', 0) == 6,
+                                    'itemType': plug_def.get('itemType', 0),
+                                    'itemSubType': plug_def.get('itemSubType', 0),
+                                    'isDefault': True
+                                }
+                                detailed_info['sockets'].append(plug_info)
+                                detailed_info['perks'].append(plug_info)
+
+        # Récupérer les stats d'instance si disponibles
+        if stats_data and 'stats' in stats_data:
+            for stat_hash, stat_value in stats_data['stats'].items():
+                stat_def = self.get_stat_definition(int(stat_hash))
+                if stat_def:
+                    detailed_info['stats'][stat_hash] = {
+                        'hash': stat_hash,
+                        'name': stat_def.get('displayProperties', {}).get('name', ''),
+                        'description': stat_def.get('displayProperties', {}).get('description', ''),
+                        'icon': stat_def.get('displayProperties', {}).get('icon', ''),
+                        'value': stat_value.get('value', 0)
+                    }
+
+        # Récupérer le niveau de puissance si disponible
+        if item_instance_data and 'primaryStat' in item_instance_data:
+            detailed_info['powerLevel'] = item_instance_data['primaryStat'].get('value', 0)
+
+        # Récupérer la perk exotique (généralement la dernière perk importante)
+        if detailed_info['rarity'] == 'Exotic':
+            exotic_perks = [perk for perk in detailed_info['perks'] if perk.get('isExotic', False)]
+            if exotic_perks:
+                # Garder seulement la dernière perk exotique (la plus importante)
+                detailed_info['perks'] = [exotic_perks[-1]]
+            else:
+                detailed_info['perks'] = []
+        else:
+            # Pour les objets non-exotiques, garder toutes les perks importantes
+            detailed_info['perks'] = [perk for perk in detailed_info['perks'] if perk.get('isExotic', False) or 'exotic' in perk.get('name', '').lower()]
+
+        return detailed_info
+
     def decode_vendor_data(self, vendor_data):
         """
         Decodes vendor data by adding readable names.
@@ -98,17 +268,64 @@ class ManifestDecoder:
                                 # Marquer cet élément comme vu
                                 seen_items[item_name] = True
                                 
-                                sale_item['itemName'] = item_name
-                                sale_item['itemDescription'] = item_def['displayProperties'].get('description', '')
-                                sale_item['itemIcon'] = item_def['displayProperties'].get('icon', '')
-
-                                tier_type = item_def.get('inventory', {}).get('tierType', 0)
-                                sale_item['rarity'] = self.get_rarity_name(tier_type)
+                                # Récupérer les informations détaillées de l'objet
+                                item_instance_data = None
+                                sockets_data = None
+                                stats_data = None
                                 
-                                # Ajouter les informations de classe
-                                class_type = item_def.get('classType', 3)
-                                sale_item['classType'] = class_type
-                                sale_item['supportedClasses'] = self.get_supported_classes(item_def)
+                                # Récupérer les données d'instance si disponibles
+                                if 'itemInstances' in response and 'data' in response['itemInstances']:
+                                    item_instances = response['itemInstances']['data']
+                                    instance_key = f"{sale_item.get('vendorItemIndex', 0)}"
+                                    if instance_key in item_instances:
+                                        item_instance_data = item_instances[instance_key]
+                                
+                                # Récupérer les données de sockets si disponibles
+                                if 'itemSockets' in response and 'data' in response['itemSockets']:
+                                    item_sockets = response['itemSockets']['data']
+                                    instance_key = f"{sale_item.get('vendorItemIndex', 0)}"
+                                    if instance_key in item_sockets:
+                                        sockets_data = item_sockets[instance_key]
+                                
+                                # Récupérer les données de stats si disponibles
+                                if 'itemStats' in response and 'data' in response['itemStats']:
+                                    item_stats = response['itemStats']['data']
+                                    instance_key = f"{sale_item.get('vendorItemIndex', 0)}"
+                                    if instance_key in item_stats:
+                                        stats_data = item_stats[instance_key]
+                                
+                                # Obtenir les informations détaillées
+                                detailed_info = self.get_item_detailed_info(
+                                    item_hash, 
+                                    item_instance_data, 
+                                    sockets_data, 
+                                    stats_data
+                                )
+                                
+                                if detailed_info:
+                                    # Copier seulement les informations simplifiées dans l'objet de vente
+                                    sale_item.update({
+                                        'itemName': detailed_info['displayProperties'].get('name', item_name),
+                                        'itemDescription': detailed_info['displayProperties'].get('description', ''),
+                                        'itemIcon': detailed_info['displayProperties'].get('icon', ''),
+                                        'rarity': detailed_info['rarity'],
+                                        'classType': detailed_info['classType'],
+                                        'supportedClasses': detailed_info['supportedClasses'],
+                                        'flavorText': detailed_info['flavorText'],
+                                        'perks': detailed_info['perks']  # Seulement les perks
+                                    })
+                                else:
+                                    # Fallback aux informations de base
+                                    sale_item.update({
+                                        'itemName': item_name,
+                                        'itemDescription': item_def['displayProperties'].get('description', ''),
+                                        'itemIcon': item_def['displayProperties'].get('icon', ''),
+                                        'rarity': self.get_rarity_name(item_def.get('inventory', {}).get('tierType', 0)),
+                                        'classType': item_def.get('classType', 3),
+                                        'supportedClasses': self.get_supported_classes(item_def),
+                                        'flavorText': item_def.get('flavorText', ''),
+                                        'perks': []  # Pas de perks disponibles
+                                    })
                                 
                                 # Ajouter l'élément filtré
                                 filtered_sale_items[sale_key] = sale_item

@@ -14,6 +14,16 @@ import Colors from "@/constants/Colors";
 
 const { width: screenWidth } = Dimensions.get("window");
 
+interface ItemPerk {
+  hash: number;
+  name: string;
+  description: string;
+  icon: string;
+  isDefault?: boolean;
+  isEquipped?: boolean;
+  isExotic?: boolean;
+}
+
 interface XurItemModalProps {
   visible: boolean;
   onClose: () => void;
@@ -32,6 +42,8 @@ interface XurItemModalProps {
     quantity: number;
     classType?: number;
     supportedClasses?: string[];
+    flavorText?: string;
+    perks?: ItemPerk[];
   } | null;
 }
 
@@ -170,6 +182,57 @@ export default function XurItemModal({
             </View>
           )}
 
+          {/* Flavor Text */}
+          {item.flavorText && (
+            <View style={styles.descriptionSection}>
+              <Text style={styles.sectionTitle}>Citation</Text>
+              <Text style={[styles.description, styles.flavorText]}>
+                "{item.flavorText}"
+              </Text>
+            </View>
+          )}
+
+          {/* Perks */}
+          {item.perks && item.perks.length > 0 && (
+            <View style={styles.perksSection}>
+              <Text style={styles.sectionTitle}>Capacité Exotique</Text>
+
+              {item.perks.map((perk, index) => (
+                <View key={index} style={styles.perkCard}>
+                  <View style={styles.perkHeader}>
+                    {perk.icon && (
+                      <View style={styles.perkIconContainer}>
+                        <Image
+                          source={{ uri: `https://www.bungie.net${perk.icon}` }}
+                          style={styles.perkIcon}
+                        />
+                      </View>
+                    )}
+                    <View style={styles.perkInfo}>
+                      <Text style={styles.perkName}>{perk.name}</Text>
+                      {perk.isExotic && (
+                        <View style={styles.exoticBadge}>
+                          <MaterialCommunityIcons
+                            name="star"
+                            size={12}
+                            color={Colors.destiny.exotic}
+                          />
+                          <Text style={styles.exoticBadgeText}>EXOTIQUE</Text>
+                        </View>
+                      )}
+                    </View>
+                  </View>
+
+                  {perk.description && (
+                    <Text style={styles.perkDescription}>
+                      {perk.description}
+                    </Text>
+                  )}
+                </View>
+              ))}
+            </View>
+          )}
+
           {/* Classes supportées */}
           {item.supportedClasses && item.supportedClasses.length > 0 && (
             <View style={styles.classesSection}>
@@ -202,11 +265,12 @@ export default function XurItemModal({
                   </View>
                 ))}
               </View>
-              {item.supportedClasses.length === 3 && (
-                <Text style={styles.allClassesNote}>
-                  ✨ Cet objet exotique est disponible pour toutes les classes !
-                </Text>
-              )}
+              {item.supportedClasses.length === 3 &&
+                item.itemName != "Xenology" && (
+                  <Text style={styles.allClassesNote}>
+                    ✨ This exotic item is available for all classes!
+                  </Text>
+                )}
             </View>
           )}
 
@@ -229,26 +293,6 @@ export default function XurItemModal({
             ) : (
               <Text style={styles.freeText}>Gratuit</Text>
             )}
-          </View>
-
-          {/* Item Details */}
-          <View style={styles.detailsSection}>
-            <Text style={styles.sectionTitle}>Détails</Text>
-
-            <View style={styles.detailRow}>
-              <Text style={styles.detailLabel}>Hash d'objet:</Text>
-              <Text style={styles.detailValue}>{item.itemHash}</Text>
-            </View>
-
-            <View style={styles.detailRow}>
-              <Text style={styles.detailLabel}>Index vendeur:</Text>
-              <Text style={styles.detailValue}>{item.vendorItemIndex}</Text>
-            </View>
-
-            <View style={styles.detailRow}>
-              <Text style={styles.detailLabel}>Quantité:</Text>
-              <Text style={styles.detailValue}>{item.quantity}</Text>
-            </View>
           </View>
 
           {/* Special Notes */}
@@ -348,6 +392,85 @@ const styles = StyleSheet.create({
     color: Colors.destiny.ghost,
     lineHeight: 24,
     opacity: 0.8,
+  },
+  flavorText: {
+    fontStyle: "italic",
+    color: Colors.destiny.ghost,
+    opacity: 0.9,
+  },
+  perksSection: {
+    padding: 24,
+    backgroundColor: "transparent",
+  },
+  perksSectionHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 20,
+    backgroundColor: "transparent",
+    gap: 12,
+  },
+  perksSectionTitle: {
+    textAlign: "center",
+    fontSize: 20,
+    fontWeight: "bold",
+    color: Colors.destiny.exotic,
+    textShadowColor: Colors.destiny.exotic,
+    textShadowOffset: { width: 0, height: 0 },
+    textShadowRadius: 6,
+  },
+  perkCard: {
+    backgroundColor: "rgba(255, 255, 255, 0.05)",
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: Colors.destiny.ghost + "20",
+  },
+  perkHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 12,
+    backgroundColor: "transparent",
+  },
+  perkIconContainer: {
+    marginRight: 16,
+  },
+  perkIcon: {
+    width: 48,
+    height: 48,
+    borderRadius: 8,
+  },
+  perkInfo: {
+    flex: 1,
+    backgroundColor: "transparent",
+  },
+  perkName: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: Colors.destiny.ghost,
+    marginBottom: 8,
+  },
+  perkDescription: {
+    fontSize: 14,
+    color: Colors.destiny.ghost,
+    opacity: 0.9,
+    lineHeight: 20,
+  },
+  exoticBadge: {
+    backgroundColor: Colors.destiny.exotic + "20",
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 6,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+    alignSelf: "flex-start",
+  },
+  exoticBadgeText: {
+    fontSize: 10,
+    color: Colors.destiny.exotic,
+    fontWeight: "bold",
   },
   priceSection: {
     padding: 24,
