@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from .routers import xur
 
 app = FastAPI(
@@ -6,7 +7,20 @@ app = FastAPI(
     description="API pour récupérer les données des vendeurs de Destiny 2",
     version="1.0.0"
 )
+
+# Configuration CORS pour Vercel
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # En production, spécifiez vos domaines
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 app.include_router(xur.router)
+
+# Variable handler pour Vercel
+handler = app
 
 @app.get("/")
 def read_root():
