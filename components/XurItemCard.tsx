@@ -21,6 +21,8 @@ interface XurItemCardProps {
     itemHash: number;
     vendorItemIndex: number;
     quantity: number;
+    classType?: number;
+    supportedClasses?: string[];
   };
   onPress: () => void;
 }
@@ -64,6 +66,32 @@ const getCurrencyIcon = (itemHash: number) => {
   }
 };
 
+const getClassIcon = (className: string) => {
+  switch (className.toLowerCase()) {
+    case "titan":
+      return "shield";
+    case "hunter":
+      return "target";
+    case "warlock":
+      return "creation";
+    default:
+      return "help-circle";
+  }
+};
+
+const getClassColor = (className: string) => {
+  switch (className.toLowerCase()) {
+    case "titan":
+      return "#FF6B35"; // Orange/rouge pour Titan
+    case "hunter":
+      return "#00D4FF"; // Bleu pour Hunter
+    case "warlock":
+      return "#9333EA"; // Violet pour Warlock
+    default:
+      return Colors.destiny.ghost;
+  }
+};
+
 export default function XurItemCard({ item, onPress }: XurItemCardProps) {
   const rarityColor = getRarityColor(item.rarity);
   const imageUri = `https://www.bungie.net${item.itemIcon}`;
@@ -99,17 +127,51 @@ export default function XurItemCard({ item, onPress }: XurItemCardProps) {
             >
               {item.itemName}
             </Text>
-            <View
-              style={[
-                styles.rarityBadge,
-                { backgroundColor: `${rarityColor}20` },
-              ]}
-            >
-              <Text style={[styles.rarityText, { color: rarityColor }]}>
-                {item.rarity}
-              </Text>
+            <View style={styles.badgeContainer}>
+              <View
+                style={[
+                  styles.rarityBadge,
+                  { backgroundColor: `${rarityColor}20` },
+                ]}
+              >
+                <Text style={[styles.rarityText, { color: rarityColor }]}>
+                  {item.rarity}
+                </Text>
+              </View>
             </View>
           </View>
+
+          {/* Classes supportées */}
+          {item.supportedClasses && item.supportedClasses.length > 0 && (
+            <View style={styles.classesContainer}>
+              <Text style={styles.classesLabel}>Disponible pour:</Text>
+              <View style={styles.classBadges}>
+                {item.supportedClasses.map((className, index) => (
+                  <View
+                    key={index}
+                    style={[
+                      styles.classBadge,
+                      { backgroundColor: `${getClassColor(className)}20` },
+                    ]}
+                  >
+                    <MaterialCommunityIcons
+                      name={getClassIcon(className)}
+                      size={12}
+                      color={getClassColor(className)}
+                    />
+                    <Text
+                      style={[
+                        styles.classText,
+                        { color: getClassColor(className) },
+                      ]}
+                    >
+                      {className}
+                    </Text>
+                  </View>
+                ))}
+              </View>
+            </View>
+          )}
 
           {item.itemDescription && (
             <Text style={styles.itemDescription} numberOfLines={2}>
@@ -222,6 +284,10 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginRight: 8,
   },
+  badgeContainer: {
+    alignItems: "flex-end",
+    backgroundColor: "transparent",
+  },
   rarityBadge: {
     paddingHorizontal: 8,
     paddingVertical: 2,
@@ -232,6 +298,37 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     textTransform: "uppercase",
     letterSpacing: 0.5,
+  },
+  classesContainer: {
+    marginBottom: 8,
+    backgroundColor: "transparent",
+  },
+  classesLabel: {
+    fontSize: 11,
+    color: Colors.destiny.ghost,
+    opacity: 0.7,
+    marginBottom: 4,
+  },
+  classBadges: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 4,
+    backgroundColor: "transparent",
+  },
+  classBadge: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 8,
+    marginRight: 4,
+    marginBottom: 2,
+  },
+  classText: {
+    fontSize: 9,
+    fontWeight: "bold",
+    marginLeft: 2,
+    textTransform: "uppercase",
   },
   itemDescription: {
     fontSize: 12,

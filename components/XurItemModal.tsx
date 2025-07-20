@@ -30,6 +30,8 @@ interface XurItemModalProps {
     itemHash: number;
     vendorItemIndex: number;
     quantity: number;
+    classType?: number;
+    supportedClasses?: string[];
   } | null;
 }
 
@@ -69,6 +71,32 @@ const getCurrencyIcon = (itemHash: number) => {
       return "triangle";
     default:
       return "help-circle";
+  }
+};
+
+const getClassIcon = (className: string) => {
+  switch (className.toLowerCase()) {
+    case "titan":
+      return "shield";
+    case "hunter":
+      return "target";
+    case "warlock":
+      return "creation";
+    default:
+      return "help-circle";
+  }
+};
+
+const getClassColor = (className: string) => {
+  switch (className.toLowerCase()) {
+    case "titan":
+      return "#FF6B35"; // Orange/rouge pour Titan
+    case "hunter":
+      return "#00D4FF"; // Bleu pour Hunter
+    case "warlock":
+      return "#9333EA"; // Violet pour Warlock
+    default:
+      return Colors.destiny.ghost;
   }
 };
 
@@ -139,6 +167,46 @@ export default function XurItemModal({
             <View style={styles.descriptionSection}>
               <Text style={styles.sectionTitle}>Description</Text>
               <Text style={styles.description}>{item.itemDescription}</Text>
+            </View>
+          )}
+
+          {/* Classes supportées */}
+          {item.supportedClasses && item.supportedClasses.length > 0 && (
+            <View style={styles.classesSection}>
+              <Text style={styles.sectionTitle}>Classes supportées</Text>
+              <View style={styles.classesGrid}>
+                {item.supportedClasses.map((className, index) => (
+                  <View
+                    key={index}
+                    style={[
+                      styles.classCard,
+                      {
+                        backgroundColor: `${getClassColor(className)}20`,
+                        borderColor: `${getClassColor(className)}60`,
+                      },
+                    ]}
+                  >
+                    <MaterialCommunityIcons
+                      name={getClassIcon(className)}
+                      size={24}
+                      color={getClassColor(className)}
+                    />
+                    <Text
+                      style={[
+                        styles.classCardText,
+                        { color: getClassColor(className) },
+                      ]}
+                    >
+                      {className}
+                    </Text>
+                  </View>
+                ))}
+              </View>
+              {item.supportedClasses.length === 3 && (
+                <Text style={styles.allClassesNote}>
+                  ✨ Cet objet exotique est disponible pour toutes les classes !
+                </Text>
+              )}
             </View>
           )}
 
@@ -337,6 +405,41 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: Colors.destiny.ghost,
     marginLeft: 8,
+    lineHeight: 20,
+  },
+  classesSection: {
+    padding: 24,
+    backgroundColor: "transparent",
+  },
+  classesGrid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 12,
+    backgroundColor: "transparent",
+    marginBottom: 16,
+  },
+  classCard: {
+    flex: 1,
+    minWidth: 80,
+    alignItems: "center",
+    padding: 16,
+    borderRadius: 12,
+    borderWidth: 1,
+    backgroundColor: "transparent",
+  },
+  classCardText: {
+    fontSize: 12,
+    fontWeight: "bold",
+    marginTop: 8,
+    textTransform: "uppercase",
+    letterSpacing: 0.5,
+  },
+  allClassesNote: {
+    fontSize: 14,
+    color: Colors.destiny.primary,
+    textAlign: "center",
+    fontStyle: "italic",
+    opacity: 0.9,
     lineHeight: 20,
   },
 });

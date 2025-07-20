@@ -152,12 +152,51 @@ export default function XurScreen() {
   const saleItems = xurData?.sales?.saleItems
     ? Object.values(xurData.sales.saleItems)
     : [];
-  const exoticItems = saleItems.filter(
-    (item) => item.rarity === "Exotic" && !item.itemName.includes("Strange")
-  );
-  const specialOffers = saleItems.filter(
-    (item) => item.itemName.includes("Strange") || item.costs.length === 0
-  );
+
+  // Filtrer les éléments exotiques (exclure Xenology et autres éléments Strange)
+  const exoticItems = saleItems.filter((item) => {
+    return (
+      item.rarity === "Exotic" &&
+      !item.itemName.includes("Strange") &&
+      !item.itemName.includes("Xenology")
+    );
+  });
+
+  // Filtrer les offres spéciales en excluant les liens inutiles et les doublons
+  const filteredSpecialOffers = saleItems.filter((item) => {
+    const name = item.itemName.toLowerCase();
+
+    // Exclure les liens inutiles de navigation dans le menu de Xur
+    const excludedLinks = [
+      "more strange offers",
+      "strange gear offers",
+      "more strange gear",
+      "strange offers",
+    ];
+
+    // Vérifier si l'élément est un lien à exclure
+    const isExcludedLink = excludedLinks.some((link) => name.includes(link));
+    if (isExcludedLink) {
+      return false;
+    }
+
+    // Inclure Xenology, les autres éléments Strange et les éléments gratuits
+    return (
+      item.itemName.includes("Strange") ||
+      item.itemName.includes("Xenology") ||
+      item.costs.length === 0
+    );
+  });
+
+  // Éliminer les doublons en se basant sur le nom de l'élément
+  const specialOffers = filteredSpecialOffers.filter((item, index, array) => {
+    // Trouver le premier élément avec le même nom
+    const firstOccurrenceIndex = array.findIndex(
+      (otherItem) => otherItem.itemName === item.itemName
+    );
+    // Garder seulement si c'est la première occurrence
+    return firstOccurrenceIndex === index;
+  });
 
   return (
     <>
@@ -247,7 +286,7 @@ export default function XurScreen() {
               Colors.destiny.dark + "60",
               Colors.destiny.dark,
             ]}
-            style={styles.inventorySection}
+            style={[styles.inventorySection, { paddingBottom: 60 }]} // Padding supplémentaire pour la dernière section
           >
             <Text style={styles.sectionTitle}>Special Offers</Text>
             <Text style={styles.sectionSubtitle}>
@@ -262,32 +301,6 @@ export default function XurScreen() {
             ))}
           </LinearGradient>
         )}
-
-        {/* Stats Section */}
-        <LinearGradient
-          colors={[
-            Colors.destiny.dark,
-            Colors.destiny.dark + "80",
-            Colors.destiny.dark,
-          ]}
-          style={styles.statsSection}
-        >
-          <Text style={styles.sectionTitle}>Statistics</Text>
-          <View style={styles.statsGrid}>
-            <View style={styles.statItem}>
-              <Text style={styles.statNumber}>{saleItems.length}</Text>
-              <Text style={styles.statLabel}>Total items</Text>
-            </View>
-            <View style={styles.statItem}>
-              <Text style={styles.statNumber}>{exoticItems.length}</Text>
-              <Text style={styles.statLabel}>Exotics</Text>
-            </View>
-            <View style={styles.statItem}>
-              <Text style={styles.statNumber}>{specialOffers.length}</Text>
-              <Text style={styles.statLabel}>Special offers</Text>
-            </View>
-          </View>
-        </LinearGradient>
       </ScrollView>
 
       {/* Item Detail Modal */}
@@ -304,7 +317,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: Colors.destiny.dark,
-    paddingBottom: 80,
+    paddingBottom: 120, // Augmenté pour laisser place aux tabs
   },
   loadingContainer: {
     flex: 1,
@@ -512,31 +525,6 @@ const styles = StyleSheet.create({
     color: Colors.destiny.ghost,
     opacity: 0.7,
     marginBottom: 16,
-    textAlign: "center",
-  },
-  statsSection: {
-    padding: 24,
-    backgroundColor: "transparent",
-  },
-  statsGrid: {
-    flexDirection: "row",
-    justifyContent: "space-around",
-    backgroundColor: "transparent",
-  },
-  statItem: {
-    alignItems: "center",
-    backgroundColor: "transparent",
-  },
-  statNumber: {
-    fontSize: 24,
-    fontWeight: "bold",
-    color: Colors.destiny.accent,
-    marginBottom: 4,
-  },
-  statLabel: {
-    fontSize: 12,
-    color: Colors.destiny.ghost,
-    opacity: 0.7,
     textAlign: "center",
   },
   inventorySection: {

@@ -103,6 +103,7 @@ async def debug_xur_data():
                         'itemType': item_def.get('itemType'),
                         'itemSubType': item_def.get('itemSubType'),
                         'classType': item_def.get('classType'),
+                        'supportedClasses': manifest_decoder.get_supported_classes(item_def),
                         'rarity': rarity,
                         'tierType': tier_type,
                         'costs': item_data.get('costs', []),
