@@ -1,15 +1,6 @@
 {
   "version": 2,
-  "builds": [
-    {
-      "src": "backend/main.py",
-      "use": "@vercel/python"
-    },
-    {
-      "src": "package.json",
-      "use": "@vercel/node"
-    }
-  ],
+  "buildCommand": "npm run build",
   "routes": [
     {
       "src": "/api/(.*)",
