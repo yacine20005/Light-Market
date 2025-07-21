@@ -46,7 +46,7 @@ export default function HomeScreen() {
         ]}
         style={styles.section}
       >
-        <Text style={styles.sectionTitle}>✨ What's Available Now</Text>
+        <Text style={styles.sectionTitle}>What's Available Now</Text>
 
         <Pressable
           style={({ pressed }) => [
@@ -89,7 +89,7 @@ export default function HomeScreen() {
         ]}
         style={[styles.section, { paddingBottom: 60 }]}
       >
-        <Text style={styles.sectionTitle}>🚀 Coming Soon</Text>
+        <Text style={styles.sectionTitle}>Coming Soon</Text>
 
         <View style={styles.upcomingCard}>
           <View style={styles.upcomingHeader}>
@@ -127,8 +127,8 @@ export default function HomeScreen() {
             <Text style={styles.upcomingTitle}>Enhanced Features</Text>
           </View>
           <Text style={styles.upcomingDescription}>
-            More customization options and personalized recommendations for your
-            gaming style.
+            More features like vendor history, community recommendations and
+            more are on the way !
           </Text>
         </View>
       </LinearGradient>
@@ -148,7 +148,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: Colors.destiny.dark,
-    paddingBottom: 120, // Space for tabs like in Xur
   },
   heroSection: {
     paddingTop: 40,
@@ -236,7 +235,8 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: "bold",
     color: Colors.destiny.ghost,
-    marginBottom: 16,
+    marginBottom: 20,
+    textAlign: "center",
     letterSpacing: 0.5,
   },
   sectionSubtitle: {
@@ -352,6 +352,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     flexDirection: "row",
     backgroundColor: "transparent",
+    paddingBottom: 80,
   },
   footerText: {
     marginLeft: 12,

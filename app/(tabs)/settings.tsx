@@ -1,4 +1,11 @@
-import { StyleSheet, ScrollView, TouchableOpacity, Alert, Linking, Pressable } from "react-native";
+import {
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+  Alert,
+  Linking,
+  Pressable,
+} from "react-native";
 import { Text, View } from "@/components/Themed";
 import { MaterialCommunityIcons, Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
@@ -11,14 +18,20 @@ export default function SettingsScreen() {
   const buildNumber = "2025.1";
 
   const handleNotificationSettings = () => {
-    Alert.alert("Notifications", "Feature coming soon! Stay tuned for push notifications.");
+    Alert.alert(
+      "Notifications",
+      "Feature coming soon! Stay tuned for push notifications."
+    );
   };
 
   const handleFeedback = async () => {
     try {
       await Linking.openURL("https://yacine-hamadouche.me/#contact");
     } catch (error) {
-      Alert.alert("Error", "Could not open the contact page. Please visit https://yacine-hamadouche.me/#contact manually.");
+      Alert.alert(
+        "Error",
+        "Could not open the contact page. Please visit https://yacine-hamadouche.me/#contact manually."
+      );
     }
   };
 
@@ -26,7 +39,10 @@ export default function SettingsScreen() {
     try {
       await Linking.openURL("https://github.com/yacine20005/Orbit-Market");
     } catch (error) {
-      Alert.alert("Error", "Could not open GitHub. Please visit https://github.com/yacine20005/Orbit-Market manually.");
+      Alert.alert(
+        "Error",
+        "Could not open GitHub. Please visit https://github.com/yacine20005/Orbit-Market manually."
+      );
     }
   };
 
@@ -34,7 +50,10 @@ export default function SettingsScreen() {
     try {
       await Linking.openURL("https://yacine-hamadouche.me");
     } catch (error) {
-      Alert.alert("Error", "Could not open portfolio. Please visit https://yacine-hamadouche.me manually.");
+      Alert.alert(
+        "Error",
+        "Could not open portfolio. Please visit https://yacine-hamadouche.me manually."
+      );
     }
   };
 
@@ -65,10 +84,11 @@ export default function SettingsScreen() {
       title: "Version",
       description: `${appVersion} (${buildNumber})`,
       icon: "information",
-      onPress: () => Alert.alert(
-        "About Orbit Market",
-        `Version ${appVersion}\nBuild ${buildNumber}\n\nYour vendor tracker for multiple games`
-      ),
+      onPress: () =>
+        Alert.alert(
+          "About Orbit Market",
+          `Version ${appVersion}\nBuild ${buildNumber}\n\nYour vendor tracker for multiple games`
+        ),
     },
     {
       id: "feedback",
@@ -123,7 +143,7 @@ export default function SettingsScreen() {
         ]}
         style={styles.section}
       >
-        <Text style={styles.sectionTitle}>⚙️ App Settings</Text>
+        <Text style={styles.sectionTitle}>App Settings</Text>
 
         {settingsOptions.map((option) => (
           <Pressable
@@ -145,11 +165,6 @@ export default function SettingsScreen() {
               <View style={styles.optionText}>
                 <View style={styles.optionTitleRow}>
                   <Text style={styles.optionTitle}>{option.title}</Text>
-                  {option.id === "notifications" && (
-                    <View style={styles.comingSoonIndicator}>
-                      <Text style={styles.comingSoonText}>SOON</Text>
-                    </View>
-                  )}
                 </View>
                 <Text style={styles.optionDescription}>
                   {option.description}
@@ -187,7 +202,7 @@ export default function SettingsScreen() {
         ]}
         style={styles.section}
       >
-        <Text style={styles.sectionTitle}>ℹ️ About</Text>
+        <Text style={styles.sectionTitle}>About</Text>
 
         {aboutOptions.map((option) => (
           <Pressable
@@ -275,10 +290,11 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   sectionTitle: {
-    fontSize: 20,
+    fontSize: 24,
     fontWeight: "bold",
     color: Colors.destiny.ghost,
-    marginBottom: 16,
+    marginBottom: 20,
+    textAlign: "center",
     letterSpacing: 0.5,
   },
   optionCard: {

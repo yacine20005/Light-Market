@@ -43,7 +43,7 @@ export default function XurScreen() {
     return (
       <View style={[styles.loadingContainer, { paddingTop: insets.top }]}>
         <ActivityIndicator size="large" color={Colors.destiny.accent} />
-        <Text style={styles.loadingText}>Chargement des données de Xûr...</Text>
+        <Text style={styles.loadingText}>Loading Xûr's data...</Text>
       </View>
     );
   }
@@ -67,10 +67,10 @@ export default function XurScreen() {
             size={64}
             color="#ef4444"
           />
-          <Text style={styles.errorTitle}>Erreur</Text>
+          <Text style={styles.errorTitle}>Error</Text>
           <Text style={styles.errorText}>{error}</Text>
           <TouchableOpacity style={styles.retryButton} onPress={refreshXurData}>
-            <Text style={styles.retryButtonText}>Réessayer</Text>
+            <Text style={styles.retryButtonText}>Retry</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>
@@ -153,7 +153,7 @@ export default function XurScreen() {
     ? Object.values(xurData.sales.saleItems)
     : [];
 
-  // Filtrer les éléments exotiques (exclure Xenology et autres éléments Strange)
+  // Filter exotic items (exclude Xenology and other Strange items)
   const exoticItems = saleItems.filter((item) => {
     return (
       item.rarity === "Exotic" &&
@@ -162,11 +162,12 @@ export default function XurScreen() {
     );
   });
 
-  // Filtrer les offres spéciales en excluant les liens inutiles et les doublons
+  // Filter special offers by excluding unnecessary links and duplicates
+
   const filteredSpecialOffers = saleItems.filter((item) => {
     const name = item.itemName.toLowerCase();
 
-    // Exclure les liens inutiles de navigation dans le menu de Xur
+    // Exclude unnecessary navigation links in Xur's menu
     const excludedLinks = [
       "more strange offers",
       "strange gear offers",
@@ -174,13 +175,13 @@ export default function XurScreen() {
       "strange offers",
     ];
 
-    // Vérifier si l'élément est un lien à exclure
+    // Check if the item is a link to exclude
     const isExcludedLink = excludedLinks.some((link) => name.includes(link));
     if (isExcludedLink) {
       return false;
     }
 
-    // Inclure Xenology, les autres éléments Strange et les éléments gratuits
+    // Include Xenology, other Strange items and free items
     return (
       item.itemName.includes("Strange") ||
       item.itemName.includes("Xenology") ||
@@ -188,13 +189,13 @@ export default function XurScreen() {
     );
   });
 
-  // Éliminer les doublons en se basant sur le nom de l'élément
+  // Remove duplicates based on item name
   const specialOffers = filteredSpecialOffers.filter((item, index, array) => {
-    // Trouver le premier élément avec le même nom
+    // Find the first item with the same name
     const firstOccurrenceIndex = array.findIndex(
       (otherItem) => otherItem.itemName === item.itemName
     );
-    // Garder seulement si c'est la première occurrence
+    // Keep only if it's the first occurrence
     return firstOccurrenceIndex === index;
   });
 
@@ -286,7 +287,7 @@ export default function XurScreen() {
               Colors.destiny.dark + "60",
               Colors.destiny.dark,
             ]}
-            style={[styles.inventorySection, { paddingBottom: 60 }]} // Padding supplémentaire pour la dernière section
+            style={[styles.inventorySection, { paddingBottom: 60 }]}
           >
             <Text style={styles.sectionTitle}>Special Offers</Text>
             <Text style={styles.sectionSubtitle}>
@@ -317,7 +318,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: Colors.destiny.dark,
-    paddingBottom: 120, // Augmenté pour laisser place aux tabs
+    paddingBottom: 120,
   },
   loadingContainer: {
     flex: 1,

@@ -19,9 +19,6 @@ app.add_middleware(
 
 app.include_router(xur.router)
 
-# Variable handler pour Vercel
-handler = app
-
 @app.get("/")
 def read_root():
     """Root endpoint for the API.
