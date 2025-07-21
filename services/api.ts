@@ -6,7 +6,7 @@ const getApiBaseUrl = () => {
   if (__DEV__) {
     const envApiUrl = process.env.EXPO_PUBLIC_API_URL;
     if (envApiUrl) {
-      console.log('🔧 Utilisation de EXPO_PUBLIC_API_URL:', envApiUrl);
+      console.log('🔧 Using EXPO_PUBLIC_API_URL:', envApiUrl);
       return envApiUrl;
     }
   }
