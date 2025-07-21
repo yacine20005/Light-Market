@@ -1,9 +1,0 @@
-node_modules
-.expo
-.next
-backend/__pycache__
-backend/**/__pycache__
-backend/manifest/*.sqlite
-*.log
-.env.local
-.DS_Store
