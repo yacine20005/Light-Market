@@ -1,5 +1,26 @@
 // API configuration and base functions
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || process.env.VERCEL_URL || (typeof window !== 'undefined' ? window.location.origin : 'http://localhost:8000');
+import { Platform } from 'react-native';
+
+const getApiBaseUrl = () => {
+  // En développement avec Expo, utiliser l'adresse configurée dans .env
+  if (__DEV__) {
+    const envApiUrl = process.env.EXPO_PUBLIC_API_URL;
+    if (envApiUrl) {
+      console.log('🔧 Utilisation de EXPO_PUBLIC_API_URL:', envApiUrl);
+      return envApiUrl;
+    }
+  }
+  
+  // Fallback pour différents environnements
+  if (Platform.OS === 'web') {
+    return 'http://localhost:8000';
+  }
+  
+  // Fallback mobile - utiliser l'IP locale par défaut
+  return 'http://192.168.1.112:8000';
+};
+
+const API_BASE_URL = getApiBaseUrl();
 
 console.log('🌐 API_BASE_URL:', API_BASE_URL);
 

@@ -1,4 +1,4 @@
-import { StyleSheet, ScrollView, TouchableOpacity, Alert } from "react-native";
+import { StyleSheet, ScrollView, TouchableOpacity, Alert, Linking } from "react-native";
 import { Text, View } from "@/components/Themed";
 import { MaterialCommunityIcons, Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
@@ -11,22 +11,31 @@ export default function SettingsScreen() {
   const buildNumber = "2025.1";
 
   const handleNotificationSettings = () => {
-    Alert.alert("Notifications", "Notification settings");
+    Alert.alert("Notifications", "Feature coming soon! Stay tuned for push notifications.");
   };
 
-  const handleThemeSettings = () => {
-    Alert.alert("Theme", "Appearance settings");
+  const handleFeedback = async () => {
+    try {
+      await Linking.openURL("https://yacine-hamadouche.me/#contact");
+    } catch (error) {
+      Alert.alert("Error", "Could not open the contact page. Please visit https://yacine-hamadouche.me/#contact manually.");
+    }
   };
 
-  const handleAbout = () => {
-    Alert.alert(
-      "About",
-      `Orbit Market v${appVersion}\nBuild ${buildNumber}\n\nApplication to check vendors accross different games`
-    );
+  const handleGitHubStar = async () => {
+    try {
+      await Linking.openURL("https://github.com/yacine20005/Orbit-Market");
+    } catch (error) {
+      Alert.alert("Error", "Could not open GitHub. Please visit https://github.com/yacine20005/Orbit-Market manually.");
+    }
   };
 
-  const handleFeedback = () => {
-    Alert.alert("Feedback", "Sending feedback");
+  const handlePortfolio = async () => {
+    try {
+      await Linking.openURL("https://yacine-hamadouche.me");
+    } catch (error) {
+      Alert.alert("Error", "Could not open portfolio. Please visit https://yacine-hamadouche.me manually.");
+    }
   };
 
   interface SettingsOption {
@@ -43,33 +52,9 @@ export default function SettingsScreen() {
     {
       id: "notifications",
       title: "Notifications",
-      description: "Alerts for new inventories",
+      description: "Alerts for new inventories (Coming Soon)",
       icon: "bell",
       onPress: handleNotificationSettings,
-      showArrow: true,
-    },
-    {
-      id: "theme",
-      title: "Theme",
-      description: "Application appearance",
-      icon: "palette",
-      onPress: handleThemeSettings,
-      showArrow: true,
-    },
-    {
-      id: "auto-refresh",
-      title: "Auto refresh",
-      description: "Automatic data update",
-      icon: "refresh",
-      onPress: () => {},
-      showToggle: true,
-    },
-    {
-      id: "cache",
-      title: "Cache",
-      description: "Clear application cache",
-      icon: "database",
-      onPress: () => Alert.alert("Cache", "Cache cleared successfully"),
       showArrow: true,
     },
   ];
@@ -80,21 +65,34 @@ export default function SettingsScreen() {
       title: "Version",
       description: `${appVersion} (${buildNumber})`,
       icon: "information",
-      onPress: handleAbout,
+      onPress: () => Alert.alert(
+        "About Orbit Market",
+        `Version ${appVersion}\nBuild ${buildNumber}\n\nYour vendor tracker for multiple games`
+      ),
     },
     {
       id: "feedback",
-      title: "Feedback",
-      description: "Send your feedback",
+      title: "Send Feedback",
+      description: "Share your thoughts and suggestions",
       icon: "message-text",
       onPress: handleFeedback,
+      showArrow: true,
     },
     {
-      id: "rate",
-      title: "Rate the app",
-      description: "Leave your review on the App Store",
-      icon: "star",
-      onPress: () => Alert.alert("Rating", "Redirecting to the App Store"),
+      id: "github",
+      title: "Star on GitHub",
+      description: "Give us a star on GitHub ⭐",
+      icon: "github",
+      onPress: handleGitHubStar,
+      showArrow: true,
+    },
+    {
+      id: "portfolio",
+      title: "Created by yacine20005",
+      description: "Visit my portfolio",
+      icon: "account-circle",
+      onPress: handlePortfolio,
+      showArrow: true,
     },
   ];
 
@@ -112,13 +110,20 @@ export default function SettingsScreen() {
             color={Colors.destiny.primary}
           />
           <Text style={styles.headerTitle}>Settings</Text>
-          <Text style={styles.headerSubtitle}>Orbit Market Configuration</Text>
+          <Text style={styles.headerSubtitle}>Configure your experience</Text>
         </View>
       </LinearGradient>
 
       {/* Settings Section */}
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Parameters</Text>
+      <LinearGradient
+        colors={[
+          Colors.destiny.dark,
+          Colors.destiny.dark + "90",
+          Colors.destiny.dark,
+        ]}
+        style={styles.section}
+      >
+        <Text style={styles.sectionTitle}>⚙️ App Settings</Text>
 
         {settingsOptions.map((option) => (
           <TouchableOpacity
@@ -159,11 +164,18 @@ export default function SettingsScreen() {
             </View>
           </TouchableOpacity>
         ))}
-      </View>
+      </LinearGradient>
 
       {/* About Section */}
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>About</Text>
+      <LinearGradient
+        colors={[
+          Colors.destiny.dark,
+          Colors.destiny.dark + "90",
+          Colors.destiny.dark,
+        ]}
+        style={styles.section}
+      >
+        <Text style={styles.sectionTitle}>ℹ️ About</Text>
 
         {aboutOptions.map((option) => (
           <TouchableOpacity
@@ -192,7 +204,7 @@ export default function SettingsScreen() {
             </View>
           </TouchableOpacity>
         ))}
-      </View>
+      </LinearGradient>
 
       {/* Footer */}
       <View style={styles.footer}>
@@ -243,6 +255,7 @@ const styles = StyleSheet.create({
   section: {
     padding: 24,
     backgroundColor: "transparent",
+    marginBottom: 8,
   },
   sectionTitle: {
     fontSize: 20,
@@ -253,15 +266,23 @@ const styles = StyleSheet.create({
   },
   optionCard: {
     marginBottom: 12,
-    borderRadius: 12,
-    backgroundColor: "rgba(30, 41, 59, 0.6)",
+    borderRadius: 16,
+    backgroundColor: "rgba(30, 41, 59, 0.4)",
     borderWidth: 1,
-    borderColor: "rgba(255, 255, 255, 0.1)",
+    borderColor: "rgba(0, 212, 255, 0.2)",
+    shadowColor: Colors.destiny.primary,
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 3,
   },
   optionContent: {
     flexDirection: "row",
     alignItems: "center",
-    padding: 16,
+    padding: 18,
     backgroundColor: "transparent",
   },
   optionText: {
@@ -273,12 +294,13 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "600",
     color: Colors.destiny.ghost,
-    marginBottom: 2,
+    marginBottom: 4,
   },
   optionDescription: {
     fontSize: 14,
     color: Colors.destiny.ghost,
-    opacity: 0.6,
+    opacity: 0.7,
+    lineHeight: 18,
   },
   toggle: {
     width: 44,

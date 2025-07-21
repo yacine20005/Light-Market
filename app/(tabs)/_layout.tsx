@@ -26,6 +26,7 @@ export default function TabLayout() {
 
   return (
     <Tabs
+      initialRouteName="index"
       screenOptions={{
         tabBarActiveTintColor: Colors.destiny.primary,
         tabBarInactiveTintColor: Colors.destiny.ghost + "60",
