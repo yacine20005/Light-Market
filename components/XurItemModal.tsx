@@ -102,11 +102,11 @@ const getClassIcon = (className: string) => {
 const getClassColor = (className: string) => {
   switch (className.toLowerCase()) {
     case "titan":
-      return "#FF6B35"; // Orange/rouge pour Titan
+      return "#FF6B35"; // Orange for Titan
     case "hunter":
-      return "#00D4FF"; // Bleu pour Hunter
+      return "#00D4FF"; // Blue for Hunter
     case "warlock":
-      return "#9333EA"; // Violet pour Warlock
+      return "#9333EA"; // Purple for Warlock
     default:
       return Colors.destiny.ghost;
   }
@@ -185,7 +185,7 @@ export default function XurItemModal({
           {/* Flavor Text */}
           {item.flavorText && (
             <View style={styles.descriptionSection}>
-              <Text style={styles.sectionTitle}>Citation</Text>
+                <Text style={styles.sectionTitle}>Quote</Text>
               <Text style={[styles.description, styles.flavorText]}>
                 "{item.flavorText}"
               </Text>
@@ -195,7 +195,7 @@ export default function XurItemModal({
           {/* Perks */}
           {item.perks && item.perks.length > 0 && (
             <View style={styles.perksSection}>
-              <Text style={styles.sectionTitle}>Capacité Exotique</Text>
+              <Text style={styles.sectionTitle}>Exotic Perk</Text>
 
               {item.perks.map((perk, index) => (
                 <View key={index} style={styles.perkCard}>
@@ -217,7 +217,7 @@ export default function XurItemModal({
                             size={12}
                             color={Colors.destiny.exotic}
                           />
-                          <Text style={styles.exoticBadgeText}>EXOTIQUE</Text>
+                          <Text style={styles.exoticBadgeText}>EXOTIC</Text>
                         </View>
                       )}
                     </View>
@@ -236,7 +236,7 @@ export default function XurItemModal({
           {/* Classes supportées */}
           {item.supportedClasses && item.supportedClasses.length > 0 && (
             <View style={styles.classesSection}>
-              <Text style={styles.sectionTitle}>Classes supportées</Text>
+              <Text style={styles.sectionTitle}>Supported Classes</Text>
               <View style={styles.classesGrid}>
                 {item.supportedClasses.map((className, index) => (
                   <View
@@ -276,7 +276,7 @@ export default function XurItemModal({
 
           {/* Price Information */}
           <View style={styles.priceSection}>
-            <Text style={styles.sectionTitle}>Prix</Text>
+            <Text style={styles.sectionTitle}>Price</Text>
             {item.costs.length > 0 ? (
               item.costs.map((cost, index) => (
                 <View key={index} style={styles.costItem}>
@@ -291,7 +291,7 @@ export default function XurItemModal({
                 </View>
               ))
             ) : (
-              <Text style={styles.freeText}>Gratuit</Text>
+              <Text style={styles.freeText}>Free</Text>
             )}
           </View>
 
@@ -303,9 +303,9 @@ export default function XurItemModal({
                 size={20}
                 color={Colors.destiny.accent}
               />
-              <Text style={styles.noteText}>
-                Cet objet donne accès à d'autres offres spéciales de Xûr
-              </Text>
+                <Text style={styles.noteText}>
+                This item grants access to other special offers from Xûr.
+                </Text>
             </View>
           )}
         </ScrollView>

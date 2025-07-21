@@ -89,11 +89,11 @@ const getClassIcon = (className: string) => {
 const getClassColor = (className: string) => {
   switch (className.toLowerCase()) {
     case "titan":
-      return "#FF6B35"; // Orange/rouge pour Titan
+      return "#FF6B35"; // Orange for Titan
     case "hunter":
-      return "#00D4FF"; // Bleu pour Hunter
+      return "#00D4FF"; // Blue for Hunter
     case "warlock":
-      return "#9333EA"; // Violet pour Warlock
+      return "#9333EA"; // Purple for Warlock
     default:
       return Colors.destiny.ghost;
   }
@@ -218,7 +218,7 @@ export default function XurItemCard({ item, onPress }: XurItemCardProps) {
                 </Text>
               </View>
             ) : (
-              <Text style={styles.freeText}>Gratuit</Text>
+              <Text style={styles.freeText}>FREE</Text>
             )}
 
             {isSpecialOffer && (
@@ -228,7 +228,7 @@ export default function XurItemCard({ item, onPress }: XurItemCardProps) {
                   size={12}
                   color={Colors.destiny.exotic}
                 />
-                <Text style={styles.specialText}>SPÉCIAL</Text>
+                <Text style={styles.specialText}>SPECIAL</Text>
               </View>
             )}
           </View>
