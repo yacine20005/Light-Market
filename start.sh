@@ -101,7 +101,22 @@ check_backend() {
 test_xur_api() {
     echo -e "${YELLOW}🧪 Test de l'API Xûr...${NC}"
     
+    # Test du statut du manifest d'abord
+    echo -e "${BLUE}📋 Vérification du statut du manifest...${NC}"
+    manifest_response=$(curl -s -w "HTTPSTATUS:%{http_code}" "${API_URL}/manifest/status")
+    manifest_http_code=$(echo $manifest_response | grep -o "HTTPSTATUS:[0-9]*" | cut -d: -f2)
+    manifest_body=$(echo $manifest_response | sed 's/HTTPSTATUS:[0-9]*$//')
+    
+    if [ "$manifest_http_code" = "200" ]; then
+        echo -e "${GREEN}✅ Endpoint manifest disponible !${NC}"
+        echo -e "${BLUE}📊 Statut du manifest:${NC}"
+        echo "$manifest_body" | python3 -m json.tool 2>/dev/null || echo "$manifest_body"
+    else
+        echo -e "${RED}❌ Endpoint manifest non accessible (Code: $manifest_http_code)${NC}"
+    fi
+    
     # Test de l'endpoint debug
+    echo -e "${BLUE}🔍 Test de l'endpoint Xûr debug...${NC}"
     response=$(curl -s -w "HTTPSTATUS:%{http_code}" "${API_URL}/xur/debug")
     http_code=$(echo $response | grep -o "HTTPSTATUS:[0-9]*" | cut -d: -f2)
     body=$(echo $response | sed 's/HTTPSTATUS:[0-9]*$//')
@@ -114,6 +129,34 @@ test_xur_api() {
     else
         echo -e "${RED}❌ API Xûr non fonctionnelle (Code: $http_code)${NC}"
         echo -e "${RED}Réponse: $body${NC}"
+        
+        # Si l'API Xûr ne fonctionne pas, proposer de forcer la mise à jour du manifest
+        echo -e "${YELLOW}🔧 Tentative de mise à jour forcée du manifest...${NC}"
+        update_response=$(curl -s -X POST -w "HTTPSTATUS:%{http_code}" "${API_URL}/manifest/update")
+        update_http_code=$(echo $update_response | grep -o "HTTPSTATUS:[0-9]*" | cut -d: -f2)
+        update_body=$(echo $update_response | sed 's/HTTPSTATUS:[0-9]*$//')
+        
+        if [ "$update_http_code" = "200" ]; then
+            echo -e "${GREEN}✅ Mise à jour du manifest réussie !${NC}"
+            echo "$update_body" | python3 -m json.tool 2>/dev/null || echo "$update_body"
+            
+            # Retester l'API après la mise à jour
+            echo -e "${BLUE}🔄 Nouveau test de l'API Xûr...${NC}"
+            sleep 2
+            retry_response=$(curl -s -w "HTTPSTATUS:%{http_code}" "${API_URL}/xur/debug")
+            retry_http_code=$(echo $retry_response | grep -o "HTTPSTATUS:[0-9]*" | cut -d: -f2)
+            
+            if [ "$retry_http_code" = "200" ]; then
+                echo -e "${GREEN}✅ API Xûr fonctionnelle après mise à jour !${NC}"
+                return 0
+            else
+                echo -e "${RED}❌ API Xûr toujours non fonctionnelle après mise à jour${NC}"
+            fi
+        else
+            echo -e "${RED}❌ Échec de la mise à jour du manifest (Code: $update_http_code)${NC}"
+            echo "$update_body"
+        fi
+        
         return 1
     fi
 }
@@ -159,6 +202,26 @@ case "${1:-help}" in
             exit 1
         fi
         ;;
+    "update-manifest")
+        echo -e "${BLUE}🔄 Mise à jour forcée du manifest...${NC}"
+        if check_backend; then
+            echo -e "${YELLOW}🔧 Demande de mise à jour du manifest...${NC}"
+            update_response=$(curl -s -X POST -w "HTTPSTATUS:%{http_code}" "${API_URL}/manifest/update")
+            update_http_code=$(echo $update_response | grep -o "HTTPSTATUS:[0-9]*" | cut -d: -f2)
+            update_body=$(echo $update_response | sed 's/HTTPSTATUS:[0-9]*$//')
+            
+            if [ "$update_http_code" = "200" ]; then
+                echo -e "${GREEN}✅ Mise à jour réussie !${NC}"
+                echo "$update_body" | python3 -m json.tool 2>/dev/null || echo "$update_body"
+            else
+                echo -e "${RED}❌ Échec de la mise à jour (Code: $update_http_code)${NC}"
+                echo "$update_body"
+            fi
+        else
+            echo -e "${RED}❌ Backend non disponible${NC}"
+            exit 1
+        fi
+        ;;
     "full"|"")
         echo -e "${BLUE}🔄 Démarrage complet (backend + frontend)...${NC}"
         
@@ -186,10 +249,11 @@ case "${1:-help}" in
         ;;
     "help"|*)
         echo -e "${BLUE}📖 Utilisation:${NC}"
-        echo -e "  $0 backend    - Démarre seulement le backend"
-        echo -e "  $0 frontend   - Démarre seulement le frontend"
-        echo -e "  $0 test       - Teste la connexion API"
-        echo -e "  $0 full       - Démarre backend + frontend (défaut)"
-        echo -e "  $0 help       - Affiche cette aide"
+        echo -e "  $0 backend         - Démarre seulement le backend"
+        echo -e "  $0 frontend        - Démarre seulement le frontend"
+        echo -e "  $0 test            - Teste la connexion API"
+        echo -e "  $0 update-manifest - Force la mise à jour du manifest"
+        echo -e "  $0 full            - Démarre backend + frontend (défaut)"
+        echo -e "  $0 help            - Affiche cette aide"
         ;;
 esac

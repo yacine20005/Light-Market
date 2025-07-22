@@ -1,19 +1,32 @@
 
+"""
+Routes for Xûr (Agent of the Nine) data
+"""
+import logging
 from fastapi import APIRouter, HTTPException
 from backend import bungie_api
 from backend.manifest_decoder import manifest_decoder
 
-router = APIRouter()
+logger = logging.getLogger(__name__)
+router = APIRouter(prefix="/xur", tags=["xur"])
 
-@router.get("/xur")
+@router.get("/")
 async def get_xur_inventory():
     """
-    Retrieves Xûr's inventory with decoded exotic items.
+    Get Xûr's inventory with decoded exotic items
     
-    Returns Xûr's location and exotic items currently for sale
+    Returns Xûr's location and currently available exotic items
     with detailed information including names, descriptions, stats and rarity.
+    
+    Returns:
+        dict: Complete Xûr inventory
+    
+    Raises:
+        HTTPException: 502 if Bungie API is unavailable
+        HTTPException: 404 if Xûr is not currently available
+        HTTPException: 500 if error processing data
     """
-    # Hash de Xûr dans l'API Bungie
+    # Xûr's vendor hash in Bungie API
     XUR_VENDOR_HASH = "2190858386"
 
     params = {"components": "Vendors,VendorSales,ItemSockets,ItemCommonData,ItemStats,ItemInstances,ItemPerks,ItemPlugStates"}
@@ -47,13 +60,23 @@ async def get_xur_inventory():
         }
 
     except Exception as e:
-        print(f"Error decoding Xûr data: {e}")
+        logger.error("Error decoding Xûr data: %s", e)
         raise HTTPException(status_code=500, detail="Error processing Xûr data") from e
 
-@router.get("/xur/debug")
+
+@router.get("/debug")
 async def debug_xur_data():
     """
-    Debug endpoint to investigate Xûr data structure.
+    Debug endpoint to investigate Xûr data structure
+    
+    This endpoint provides detailed information about the data structure
+    returned by Bungie API for Xûr, useful for debugging and development.
+    
+    Returns:
+        dict: Debug information about Xûr data
+    
+    Raises:
+        HTTPException: 502 if unable to retrieve data
     """
     XUR_VENDOR_HASH = "2190858386"
     
@@ -76,7 +99,7 @@ async def debug_xur_data():
         'exotic_items_analysis': {}
     }
     
-    # Analyser les ventes
+    # Analyze sales
     if 'sales' in response and 'data' in response['sales']:
         xur_sales = response['sales']['data'].get(XUR_VENDOR_HASH, {})
         debug_info['sales_structure'] = {
