@@ -110,19 +110,27 @@ export function useXur(): UseXurResult {
   }, [currentTime]);
 
   const isXurPresent = useCallback((): boolean => {
-    if (xurData?.isAvailable) return true;
-    
-    // Calculate based on local time if API data is not available
+    // Calculate based on local time - this should always take precedence
     const XUR_HOUR = 18;
     
     const currentDay = currentTime.getDay();
     const currentHour = currentTime.getHours();
     
     // Xûr is present from Friday 18h to Tuesday 18h (local time)
-    return (currentDay === 5 && currentHour >= XUR_HOUR) || // Friday after 18h
-           currentDay === 6 || currentDay === 0 || currentDay === 1 || // Weekend and Monday
-           (currentDay === 2 && currentHour < XUR_HOUR); // Tuesday before 18h
-  }, [xurData, currentTime]);
+    const shouldBePresent = (currentDay === 5 && currentHour >= XUR_HOUR) || // Friday after 18h
+                           currentDay === 6 || currentDay === 0 || currentDay === 1 || // Weekend and Monday
+                           (currentDay === 2 && currentHour < XUR_HOUR); // Tuesday before 18h
+    
+    // Local time calculation takes precedence over API data
+    // Only trust API data if it confirms Xûr should not be present
+    if (!shouldBePresent) {
+      return false;
+    }
+    
+    // If local time says Xûr should be present, check API data for confirmation
+    // If API data is not available or says false, still trust local time
+    return shouldBePresent;
+  }, [currentTime]);
 
   const refreshXurData = useCallback(async () => {
     try {

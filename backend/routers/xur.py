@@ -3,12 +3,37 @@
 Routes for Xûr (Agent of the Nine) data
 """
 import logging
+from datetime import datetime
 from fastapi import APIRouter, HTTPException
 from backend import bungie_api
 from backend.manifest_decoder import manifest_decoder
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/xur", tags=["xur"])
+
+def is_xur_currently_available() -> bool:
+    """
+    Check if Xûr should be available based on current time.
+    Xûr is available from Friday 18:00 to Tuesday 18:00 (local time).
+    """
+    now = datetime.now()
+    current_day = now.weekday()  # 0 = Monday, 1 = Tuesday, ..., 4 = Friday, 5 = Saturday, 6 = Sunday
+    current_hour = now.hour
+    
+    XUR_HOUR = 18
+    
+    # Convert to same format as frontend (0 = Sunday, 1 = Monday, ..., 5 = Friday, 6 = Saturday)
+    frontend_day = (current_day + 1) % 7
+    
+    # Xûr is present from Friday 18h to Tuesday 18h
+    if frontend_day == 5 and current_hour >= XUR_HOUR:  # Friday after 18h
+        return True
+    elif frontend_day in [6, 0, 1]:  # Weekend (Saturday, Sunday) and Monday
+        return True
+    elif frontend_day == 2 and current_hour < XUR_HOUR:  # Tuesday before 18h
+        return True
+    else:
+        return False
 
 @router.get("/")
 async def get_xur_inventory():
@@ -40,6 +65,10 @@ async def get_xur_inventory():
     response = vendor_data.get('Response', {})
     vendors = response.get('vendors', {}).get('data', {})
 
+    # First check if it's the right time for Xûr
+    if not is_xur_currently_available():
+        raise HTTPException(status_code=404, detail="Xûr is not currently available (outside schedule)")
+
     if XUR_VENDOR_HASH not in vendors:
         raise HTTPException(status_code=404, detail="Xûr is not currently available")
 
@@ -50,7 +79,7 @@ async def get_xur_inventory():
         xur_response = {
             'vendor': decoded_data['Response']['vendors']['data'].get(XUR_VENDOR_HASH, {}),
             'sales': decoded_data['Response']['sales']['data'].get(XUR_VENDOR_HASH, {}),
-            'isAvailable': True
+            'isAvailable': is_xur_currently_available()
         }
 
         return {
