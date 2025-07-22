@@ -22,7 +22,6 @@
           "NSAllowsArbitraryLoads": true
         }
       }
-
     },
     "android": {
       "adaptiveIcon": {
@@ -43,12 +42,20 @@
         "babel": {
           "include": [
             "web"
-                "expo-router",
-      "expo-build-properties"
-}
+          ]
+        }
+      }
     },
     "plugins": [
-      "expo-router"
+      "expo-router",
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "usesCleartextTraffic": true
+          }
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true
