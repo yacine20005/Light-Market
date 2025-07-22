@@ -9,6 +9,8 @@ services:
       - "8000:8000"
     environment:
       - PYTHONPATH=/app
+    env_file:
+      - .env
     volumes:
       - ./backend/manifest:/app/backend/manifest
     networks:

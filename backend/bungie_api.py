@@ -5,6 +5,7 @@ import httpx
 from dotenv import load_dotenv
 
 load_dotenv()
+
 BUNGIE_API_KEY = os.getenv("BUNGIE_API_KEY")
 if BUNGIE_API_KEY is None:
     raise ValueError("BUNGIE_API_KEY environment variable is not set.")

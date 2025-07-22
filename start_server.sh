@@ -29,9 +29,9 @@ fi
 
 # Build and launch application with Docker
 echo "🐳 Building Docker image..."
-docker-compose down --remove-orphans || true
-docker-compose build --no-cache
-docker-compose up -d
+docker compose down --remove-orphans || true
+docker compose build --no-cache
+docker compose up -d
 
 # Wait for application to be ready
 echo "⏳ Waiting for application to start..."
@@ -42,7 +42,7 @@ if curl -f http://localhost:8000/health > /dev/null 2>&1; then
     echo "✅ Application started successfully!"
 else
     echo "❌ Error: Application is not responding"
-    docker-compose logs
+    docker compose logs
     exit 1
 fi
 
