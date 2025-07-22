@@ -2,7 +2,7 @@
 import { Platform } from 'react-native';
 
 const getApiBaseUrl = () => {
-  if (__DEV__) {
+  /*if (__DEV__) {
     const envApiUrl = process.env.EXPO_PUBLIC_API_URL;
     if (envApiUrl) {
       console.log('🔧 Using EXPO_PUBLIC_API_URL:', envApiUrl);
@@ -16,7 +16,7 @@ const getApiBaseUrl = () => {
     // Fallback for mobile development
     return 'http://192.168.1.112:8000';
   }
-  
+  */
   // In production, use the configured API URL
   return 'https://api.yacine-hamadouche.me';
 };

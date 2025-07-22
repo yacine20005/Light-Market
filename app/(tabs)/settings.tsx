@@ -15,8 +15,6 @@ import Colors from "@/constants/Colors";
 export default function SettingsScreen() {
   const insets = useSafeAreaInsets();
   const appVersion = "1.0.0";
-  const buildNumber = "2025.1";
-
   const handleNotificationSettings = () => {
     Alert.alert(
       "Notifications",
@@ -81,36 +79,36 @@ export default function SettingsScreen() {
   const aboutOptions: SettingsOption[] = [
     {
       id: "version",
-      title: "Version",
-      description: `${appVersion} (${buildNumber})`,
-      icon: "information",
+      title: "App Version",
+      description: `v${appVersion}`,
+      icon: "information-outline",
       onPress: () =>
         Alert.alert(
           "About Orbit Market",
-          `Version ${appVersion}\nBuild ${buildNumber}\n\nYour vendor tracker for multiple games`
+          `Version: ${appVersion}\nOrbit Market helps you track vendors across multiple games.`
         ),
     },
     {
       id: "feedback",
       title: "Send Feedback",
-      description: "Share your thoughts and suggestions",
-      icon: "message-text",
+      description: "Share your ideas and suggestions",
+      icon: "message-text-outline",
       onPress: handleFeedback,
       showArrow: true,
     },
     {
       id: "github",
-      title: "Star on GitHub",
-      description: "Give us a star on GitHub ⭐",
+      title: "GitHub",
+      description: "⭐ Give us a star on GitHub",
       icon: "github",
       onPress: handleGitHubStar,
       showArrow: true,
     },
     {
       id: "portfolio",
-      title: "Created by yacine20005",
-      description: "Visit my portfolio",
-      icon: "account-circle",
+      title: "Creator's Portfolio",
+      description: "Discover my work",
+      icon: "account-circle-outline",
       onPress: handlePortfolio,
       showArrow: true,
     },
@@ -382,6 +380,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     flexDirection: "row",
     backgroundColor: "transparent",
+    paddingBottom: 80,
   },
   footerText: {
     marginLeft: 12,

@@ -132,14 +132,6 @@ export default function HomeScreen() {
           </Text>
         </View>
       </LinearGradient>
-
-      {/* Footer */}
-      <View style={styles.footer}>
-        <FontAwesome6 name="ghost" size={20} color={Colors.destiny.primary} />
-        <Text style={styles.footerText}>
-          Orbit Market • Created by yacine20005
-        </Text>
-      </View>
     </ScrollView>
   );
 }

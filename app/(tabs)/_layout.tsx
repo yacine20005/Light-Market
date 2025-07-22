@@ -1,6 +1,7 @@
 import React from "react";
 import { MaterialCommunityIcons, Ionicons } from "@expo/vector-icons";
 import { Tabs } from "expo-router";
+import * as Haptics from "expo-haptics";
 
 import Colors from "@/constants/Colors";
 import { useColorScheme } from "@/components/useColorScheme";
@@ -23,6 +24,11 @@ function IonicIcon(props: {
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
+
+  const handleTabPress = () => {
+    // Trigger light haptic feedback on tab change
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+  };
 
   return (
     <Tabs
@@ -67,12 +73,18 @@ export default function TabLayout() {
             <MaterialIcon name="alien" color={color} />
           ),
         }}
+        listeners={{
+          tabPress: handleTabPress,
+        }}
       />
       <Tabs.Screen
         name="index"
         options={{
           title: "Home",
           tabBarIcon: ({ color }) => <IonicIcon name="home" color={color} />,
+        }}
+        listeners={{
+          tabPress: handleTabPress,
         }}
       />
       <Tabs.Screen
@@ -82,6 +94,9 @@ export default function TabLayout() {
           tabBarIcon: ({ color }) => (
             <IonicIcon name="settings" color={color} />
           ),
+        }}
+        listeners={{
+          tabPress: handleTabPress,
         }}
       />
     </Tabs>

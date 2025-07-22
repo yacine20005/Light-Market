@@ -103,9 +103,8 @@ export default function XurScreen() {
                 color="#8B5CF6"
                 style={styles.alienIcon}
               />
-              <View style={styles.alienGlow} />
             </View>
-            <Text style={styles.countdownTitle}>🚀 Xûr arrives in 🚀</Text>
+            <Text style={styles.countdownTitle}>Xûr arrives in</Text>
 
             {/* Modern Time Display */}
             <View style={styles.timeContainer}>
@@ -419,7 +418,7 @@ const styles = StyleSheet.create({
     overflow: "hidden",
   },
   countdownTime: {
-    fontSize: 42,
+    fontSize: 40,
     fontWeight: "900",
     color: "#8B5CF6",
     textAlign: "center",
