@@ -11,10 +11,11 @@ import { MaterialCommunityIcons, Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Colors from "@/constants/Colors";
+import appConfig from "../../app.json";
 
 export default function SettingsScreen() {
   const insets = useSafeAreaInsets();
-  const appVersion = "1.0.0";
+  const appVersion = appConfig.expo.version;
   const handleNotificationSettings = () => {
     Alert.alert(
       "Notifications",
