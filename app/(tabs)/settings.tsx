@@ -51,7 +51,7 @@ export default function SettingsScreen() {
     } catch (error) {
       Alert.alert(
         "Error",
-        "Could not open portfolio. Please visit https://yacine-hamadouche.me manually."
+        "Could not open portfolio. Please visit https://yacine-hamadouche.me manually. "
       );
     }
   };
