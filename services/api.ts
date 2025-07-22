@@ -1,23 +1,7 @@
 // API configuration and base functions
-import { Platform } from 'react-native';
 
 const getApiBaseUrl = () => {
-  /*if (__DEV__) {
-    const envApiUrl = process.env.EXPO_PUBLIC_API_URL;
-    if (envApiUrl) {
-      console.log('🔧 Using EXPO_PUBLIC_API_URL:', envApiUrl);
-      return envApiUrl;
-    }
-    
-    // Fallback pour web development
-    if (Platform.OS === 'web') {
-      return 'http://localhost:8000';
-    }
-    // Fallback for mobile development
-    return 'http://192.168.1.112:8000';
-  }
-  */
-  // In production, use the configured API URL
+  // URL de production sans le slash final pour éviter les problèmes de redirection
   return 'https://api.yacine-hamadouche.me';
 };
 
@@ -76,23 +60,66 @@ export interface ApiResponse<T> {
 
 class ApiService {
   private async makeRequest<T>(endpoint: string): Promise<T> {
+    const url = `${API_BASE_URL}${endpoint}`;
+    console.log(`🔄 Making API request to: ${url}`);
+    
     try {
-      const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 secondes timeout
+      
+      const response = await fetch(url, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'User-Agent': 'OrbitMarket/1.1.1',
         },
+        signal: controller.signal,
+        // Options pour améliorer la compatibilité mobile
+        cache: 'no-cache',
+        redirect: 'follow',
       });
 
+      clearTimeout(timeoutId);
+      console.log(`📡 Response status: ${response.status} for ${endpoint}`);
+
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        const errorText = await response.text().catch(() => 'Impossible de lire la réponse d\'erreur');
+        console.error(`❌ HTTP Error ${response.status}: ${errorText}`);
+        throw new Error(`Erreur HTTP ${response.status}: ${response.statusText || 'Erreur du serveur'}`);
       }
 
       const data = await response.json();
+      console.log(`✅ Successfully fetched data from ${endpoint}`);
       return data;
+      
     } catch (error) {
-      console.error(`API request failed for ${endpoint}:`, error);
-      throw error;
+      console.error(`💥 API request failed for ${endpoint}:`, error);
+      
+      // Gestion spécifique des erreurs
+      if (error instanceof Error) {
+        if (error.name === 'AbortError') {
+          throw new Error('Timeout: La requête a pris trop de temps (15s)');
+        } 
+        
+        if (error.name === 'TypeError') {
+          // Erreur réseau typique sur mobile
+          throw new Error('Erreur réseau: Vérifiez votre connexion internet');
+        }
+        
+        if (error.message.includes('SSL') || error.message.includes('certificate')) {
+          throw new Error('Erreur de certificat SSL: Problème de sécurité réseau');
+        }
+        
+        if (error.message.includes('Network request failed')) {
+          throw new Error('Requête réseau échouée: Impossible de contacter le serveur');
+        }
+        
+        // Retourner l'erreur telle quelle si elle a un message explicite
+        throw error;
+      }
+      
+      throw new Error('Erreur inconnue lors de la requête API');
     }
   }
 
