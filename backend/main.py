@@ -6,66 +6,66 @@ from fastapi.middleware.cors import CORSMiddleware
 from .routers import xur, general, manifest
 from .manifest_manager import update_manifest_if_needed
 
-# Configuration du logging
+# Logging configuration
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# Variable globale pour la tâche périodique
+# Global variable for periodic task
 periodic_task = None
 
 async def periodic_manifest_update():
-    """Tâche périodique pour mettre à jour le manifest chaque semaine"""
+    """Periodic task to update the manifest every week"""
     while True:
         try:
-            logger.info("🔄 Mise à jour périodique du manifest...")
+            logger.info("🔄 Periodic manifest update...")
             await update_manifest_if_needed()
-            logger.info("✅ Mise à jour périodique terminée")
+            logger.info("✅ Periodic update completed")
         except Exception as e:
-            logger.error(f"❌ Erreur lors de la mise à jour périodique: {e}")
+            logger.error(f"❌ Error during periodic update: {e}")
         
-        # Attendre 7 jours (604800 secondes)
+        # Wait 7 days (604800 seconds)
         await asyncio.sleep(604800)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    """Gestionnaire du cycle de vie de l'application"""
+    """Application lifecycle manager"""
     global periodic_task
     
     # Startup
-    logger.info("🚀 Démarrage de l'API Orbit Market...")
+    logger.info("🚀 Starting Orbit Market API...")
     
-    # Télécharger le manifest au démarrage
-    logger.info("📥 Téléchargement initial du manifest...")
+    # Download manifest on startup
+    logger.info("📥 Initial manifest download...")
     try:
         await update_manifest_if_needed()
-        logger.info("✅ Manifest initialisé avec succès")
+        logger.info("✅ Manifest initialized successfully")
     except Exception as e:
-        logger.error(f"❌ Erreur lors de l'initialisation du manifest: {e}")
-        logger.warning("⚠️ L'API continuera de fonctionner mais certaines fonctionnalités peuvent être limitées")
+        logger.error("❌ Error during manifest initialization: %s", e)
+        logger.warning("⚠️ API will continue running but some features may be limited")
     
-    # Démarrer la tâche périodique
-    logger.info("⏰ Démarrage de la mise à jour hebdomadaire du manifest...")
+    # Start periodic task
+    logger.info("⏰ Starting weekly manifest update...")
     periodic_task = asyncio.create_task(periodic_manifest_update())
     
     yield
     
     # Shutdown
-    logger.info("🛑 Arrêt de l'API...")
+    logger.info("🛑 Stopping API...")
     if periodic_task:
         periodic_task.cancel()
         try:
             await periodic_task
         except asyncio.CancelledError:
-            logger.info("✅ Tâche périodique arrêtée")
+            logger.info("✅ Periodic task stopped")
 
 app = FastAPI(
     title="Orbit Market API",
-    description="API pour récupérer les données des vendeurs de Destiny 2",
+    description="API to retrieve Destiny 2 vendor data",
     version="1.0.0",
     lifespan=lifespan
 )
 
-# Configuration CORS pour Vercel
+# CORS configuration for Vercel
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
