@@ -1,0 +1,19 @@
+version: "3.8"
+
+services:
+  orbit-market-api:
+    build: .
+    container_name: orbit-market-backend
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      - PYTHONPATH=/app
+    volumes:
+      - ./backend/manifest:/app/backend/manifest
+    networks:
+      - orbit-network
+
+networks:
+  orbit-network:
+    driver: bridge
