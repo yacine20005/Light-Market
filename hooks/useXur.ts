@@ -134,15 +134,28 @@ export function useXur(): UseXurResult {
 
   const refreshXurData = useCallback(async () => {
     try {
+      console.log(`🔄 [useXur] Starting Xur data refresh...`);
       setIsLoading(true);
       setError(null);
       
       const response = await apiService.getXurInventory();
+      console.log(`✅ [useXur] Successfully got Xur data:`, response);
       setXurData(response.Response);
     } catch (err) {
-      console.error('Failed to fetch Xûr data:', err);
-      setError('Failed to fetch Xûr data');
+      console.error('💥 [useXur] Failed to fetch Xûr data:', err);
+      
+      // Message d'erreur plus explicite basé sur le type d'erreur
+      let errorMessage = 'Erreur inconnue';
+      if (err instanceof Error) {
+        errorMessage = err.message;
+      } else if (typeof err === 'string') {
+        errorMessage = err;
+      }
+      
+      console.error('💥 [useXur] Setting error state:', errorMessage);
+      setError(errorMessage);
     } finally {
+      console.log(`🏁 [useXur] Refresh completed, setting loading to false`);
       setIsLoading(false);
     }
   }, []);

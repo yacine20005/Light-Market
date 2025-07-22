@@ -17,8 +17,12 @@
       "supportsTablet": true,
       "bundleIdentifier": "com.yacine20005.orbitmarket",
       "infoPlist": {
-        "ITSAppUsesNonExemptEncryption": false
+        "ITSAppUsesNonExemptEncryption": false,
+        "NSAppTransportSecurity": {
+          "NSAllowsArbitraryLoads": true
+        }
       }
+
     },
     "android": {
       "adaptiveIcon": {
@@ -39,9 +43,9 @@
         "babel": {
           "include": [
             "web"
-          ]
-        }
-      }
+                "expo-router",
+      "expo-build-properties"
+}
     },
     "plugins": [
       "expo-router"

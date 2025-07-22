@@ -4,6 +4,7 @@ import {
   TouchableOpacity,
   RefreshControl,
   ActivityIndicator,
+  Alert,
 } from "react-native";
 import { Text, View } from "@/components/Themed";
 import { MaterialCommunityIcons, Ionicons } from "@expo/vector-icons";
@@ -14,6 +15,7 @@ import Colors from "@/constants/Colors";
 import { useXur } from "@/hooks/useXur";
 import XurItemCard from "@/components/XurItemCard";
 import XurItemModal from "@/components/XurItemModal";
+import { apiService } from "@/services/api";
 
 export default function XurScreen() {
   const insets = useSafeAreaInsets();
@@ -36,6 +38,28 @@ export default function XurScreen() {
   const closeModal = () => {
     setModalVisible(false);
     setSelectedItem(null);
+  };
+
+  const runNetworkDiagnostic = async () => {
+    try {
+      Alert.alert("🔍 Diagnostic réseau", "Test de connectivité en cours...", [
+        { text: "OK" },
+      ]);
+
+      const debugInfo = await apiService.getXurDebugInfo();
+      Alert.alert(
+        "✅ Diagnostic réseau",
+        `Connexion OK!\nStatut: ${
+          debugInfo.available_components ? "API disponible" : "API indisponible"
+        }`,
+        [{ text: "OK" }]
+      );
+    } catch (error) {
+      const errorMsg = error instanceof Error ? error.message : String(error);
+      Alert.alert("❌ Diagnostic réseau", `Erreur détectée:\n${errorMsg}`, [
+        { text: "OK" },
+      ]);
+    }
   };
 
   // Show loading state
@@ -71,6 +95,14 @@ export default function XurScreen() {
           <Text style={styles.errorText}>{error}</Text>
           <TouchableOpacity style={styles.retryButton} onPress={refreshXurData}>
             <Text style={styles.retryButtonText}>Retry</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.diagnosticButton}
+            onPress={runNetworkDiagnostic}
+          >
+            <Text style={styles.diagnosticButtonText}>
+              🔍 Diagnostic réseau
+            </Text>
           </TouchableOpacity>
         </View>
       </ScrollView>
@@ -356,11 +388,25 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
     paddingVertical: 12,
     borderRadius: 8,
+    marginBottom: 12,
   },
   retryButtonText: {
     fontSize: 16,
     fontWeight: "bold",
     color: Colors.destiny.dark,
+  },
+  diagnosticButton: {
+    backgroundColor: Colors.destiny.legendary,
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: Colors.destiny.accent,
+  },
+  diagnosticButtonText: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: Colors.destiny.accent,
   },
   countdownSection: {
     paddingTop: 40,
