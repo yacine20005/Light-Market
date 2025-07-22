@@ -18,7 +18,7 @@ const getApiBaseUrl = () => {
   }
   
   // In production, use the configured API URL
-  return 'https://api.votre-domaine.com';
+  return 'https://api.yacine-hamadouche.me';
 };
 
 const API_BASE_URL = getApiBaseUrl();
