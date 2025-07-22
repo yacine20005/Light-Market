@@ -57,6 +57,7 @@ sudo nginx -t && sudo systemctl reload nginx
 echo "🔒 Configuring SSL..."
 sudo certbot --nginx -d $DOMAIN --non-interactive --agree-tos --email ya.hamadouche@gmail.com
 
+
 echo "🎉 Deployment completed!"
 echo "📍 Your API is accessible at: https://$DOMAIN"
 echo "🔍 Check health: https://$DOMAIN/health"
