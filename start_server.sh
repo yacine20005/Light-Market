@@ -21,12 +21,12 @@ cd $APP_DIR
 # Clone or update repository
 if [ -d ".git" ]; then
     echo "📥 Updating code..."
-    git pull origin main
+    git fetch origin
+    git reset --hard origin/main
 else
     echo "📦 Cloning repository..."
     git clone $REPO_URL .
 fi
-
 # Build and launch application with Docker
 echo "🐳 Building Docker image..."
 docker compose down --remove-orphans || true
