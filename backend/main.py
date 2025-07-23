@@ -68,14 +68,9 @@ app = FastAPI(
 # CORS configuration for production and development
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "https://api.yacine-hamadouche.me",
-        "http://localhost:8081",  # Expo development server
-        "http://localhost:19006", # Expo web development
-        "exp://localhost:19000",  # Expo development app
-    ],
+    allow_origins=["*"],
     allow_credentials=True,
-    allow_methods=["GET", "POST", "PUT", "DELETE"],
+    allow_methods=["*"],
     allow_headers=["*"],
 )
 

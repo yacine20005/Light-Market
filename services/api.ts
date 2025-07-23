@@ -93,8 +93,6 @@ class ApiService {
         },
         // Gestion des redirections
         redirect: 'follow',
-        // Timeout plus long pour les connexions mobiles
-        signal: AbortSignal.timeout(15000), // 15 secondes
       };
 
       const response = await fetch(url, fetchOptions);
@@ -120,9 +118,9 @@ class ApiService {
       });
       
       // Retry logic simple pour les erreurs réseau
-      if (retryCount < 2 && (errorObj.name === 'TypeError' || errorObj.name === 'AbortError' || errorObj.message?.includes('fetch'))) {
+      if (retryCount < 2 && (errorObj.name === 'TypeError' || errorObj.message?.includes('fetch'))) {
         console.log(`🔄 Retrying request (attempt ${retryCount + 1}/3)...`);
-        await new Promise(resolve => setTimeout(resolve, 2000 * (retryCount + 1))); // Délai plus long
+        await new Promise(resolve => setTimeout(resolve, 2000 * (retryCount + 1)));
         return this.makeRequest(endpoint, retryCount + 1);
       }
       
@@ -142,10 +140,11 @@ class ApiService {
   async testConnection(): Promise<any> {
     try {
       console.log('🔧 Testing basic connection...');
+      
       const response = await fetch(`${API_BASE_URL}/xur`, {
         method: 'HEAD', // Juste tester la connectivité
-        signal: AbortSignal.timeout(10000),
       });
+      
       return {
         success: true,
         status: response.status,
