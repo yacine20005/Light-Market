@@ -17,7 +17,7 @@ const getApiBaseUrl = () => {
     return 'http://192.168.1.112:8000';
   }
   */
-  // In production, use the configured API URL
+  // In production, use HTTPS directly (no redirections)
   return 'https://api.yacine-hamadouche.me';
 };
 
@@ -76,23 +76,56 @@ export interface ApiResponse<T> {
 }
 
 class ApiService {
-  private async makeRequest<T>(endpoint: string): Promise<T> {
+  private async makeRequest<T>(endpoint: string, retryCount = 0): Promise<T> {
+    const url = `${API_BASE_URL}${endpoint}`;
+    
     try {
-      const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+      console.log(`🌐 Making request to: ${url}`);
+      
+      // Configuration spécifique pour les applications mobiles
+      const fetchOptions: RequestInit = {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          // Ajouter User-Agent pour éviter certains blocages
+          'User-Agent': 'OrbitMarket/1.0',
         },
-      });
+        // Gestion des redirections
+        redirect: 'follow',
+        // Timeout plus long pour les connexions mobiles
+        signal: AbortSignal.timeout(15000), // 15 secondes
+      };
+
+      const response = await fetch(url, fetchOptions);
+
+      console.log(`📡 Response status: ${response.status} ${response.statusText}`);
+      console.log(`📡 Response URL: ${response.url}`);
 
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        throw new Error(`HTTP error! status: ${response.status} - ${response.statusText}`);
       }
 
       const data = await response.json();
       return data;
     } catch (error) {
-      console.error(`API request failed for ${endpoint}:`, error);
+      console.error(`❌ API request failed for ${endpoint}:`, error);
+      
+      // Type guard pour error
+      const errorObj = error as Error;
+      console.error(`❌ Error details:`, {
+        name: errorObj.name || 'Unknown',
+        message: errorObj.message || 'Unknown error',
+        stack: errorObj.stack || 'No stack trace'
+      });
+      
+      // Retry logic simple pour les erreurs réseau
+      if (retryCount < 2 && (errorObj.name === 'TypeError' || errorObj.name === 'AbortError' || errorObj.message?.includes('fetch'))) {
+        console.log(`🔄 Retrying request (attempt ${retryCount + 1}/3)...`);
+        await new Promise(resolve => setTimeout(resolve, 2000 * (retryCount + 1))); // Délai plus long
+        return this.makeRequest(endpoint, retryCount + 1);
+      }
+      
       throw error;
     }
   }
@@ -103,6 +136,30 @@ class ApiService {
 
   async getXurDebugInfo(): Promise<any> {
     return this.makeRequest('/xur/debug');
+  }
+
+  // Méthode de test simple pour diagnostiquer les problèmes de connexion
+  async testConnection(): Promise<any> {
+    try {
+      console.log('🔧 Testing basic connection...');
+      const response = await fetch(`${API_BASE_URL}/xur`, {
+        method: 'HEAD', // Juste tester la connectivité
+        signal: AbortSignal.timeout(10000),
+      });
+      return {
+        success: true,
+        status: response.status,
+        url: response.url,
+        headers: Object.fromEntries(response.headers.entries())
+      };
+    } catch (error) {
+      const errorObj = error as Error;
+      return {
+        success: false,
+        error: errorObj.message || 'Unknown error',
+        name: errorObj.name || 'Unknown'
+      };
+    }
   }
 }
 
