@@ -197,4 +197,3 @@ async def debug_xur_data():
                     }
     
     return debug_info
-

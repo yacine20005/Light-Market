@@ -79,6 +79,56 @@ export default function XurScreen() {
 
   // Show countdown when Xur is not present
   if (!isXurPresent) {
+    // Get last inventory data even when Xur is not present
+    const saleItems = xurData?.sales?.saleItems
+      ? Object.values(xurData.sales.saleItems)
+      : [];
+
+    // Filter exotic items (exclude Xenology and other Strange items)
+    const exoticItems = saleItems.filter((item) => {
+      return (
+        item.rarity === "Exotic" &&
+        !item.itemName.includes("Strange") &&
+        !item.itemName.includes("Xenology")
+      );
+    });
+
+    // Filter special offers
+    const filteredSpecialOffers = saleItems.filter((item) => {
+      const name = item.itemName.toLowerCase();
+
+      // Exclude unnecessary navigation links in Xur's menu
+      const excludedLinks = [
+        "more strange offers",
+        "strange gear offers",
+        "more strange gear",
+        "strange offers",
+      ];
+
+      // Check if the item is a link to exclude
+      const isExcludedLink = excludedLinks.some((link) => name.includes(link));
+      if (isExcludedLink) {
+        return false;
+      }
+
+      // Include Xenology, other Strange items and free items
+      return (
+        item.itemName.includes("Strange") ||
+        item.itemName.includes("Xenology") ||
+        item.costs.length === 0
+      );
+    });
+
+    // Remove duplicates based on item name
+    const specialOffers = filteredSpecialOffers.filter((item, index, array) => {
+      // Find the first item with the same name
+      const firstOccurrenceIndex = array.findIndex(
+        (otherItem) => otherItem.itemName === item.itemName
+      );
+      // Keep only if it's the first occurrence
+      return firstOccurrenceIndex === index;
+    });
+
     return (
       <ScrollView
         style={[styles.container, { paddingTop: insets.top }]}
@@ -135,14 +185,66 @@ export default function XurScreen() {
           </View>
         </LinearGradient>
 
-        {/* Info Section */}
-        <View style={styles.infoSection}>
-          <Text style={styles.sectionTitle}>About Xûr</Text>
-          <Text style={styles.infoText}>
-            Xûr, Agent of the Nine, is a mysterious vendor who appears in
-            Destiny 2 from Friday 6:00 PM to Tuesday 6:00 PM (Paris time).
-          </Text>
-        </View>
+        {/* Subtle transition gradient */}
+        <LinearGradient
+          colors={["#0F0B1F", Colors.destiny.dark + "20", Colors.destiny.dark]}
+          style={styles.subtleTransition}
+        />
+
+        {/* Previous Inventory Section */}
+        {(exoticItems.length > 0 || specialOffers.length > 0) && (
+          <>
+            {/* Previous Exotic Items */}
+            {exoticItems.length > 0 && (
+              <LinearGradient
+                colors={[
+                  Colors.destiny.dark,
+                  Colors.destiny.dark + "70",
+                  Colors.destiny.dark,
+                ]}
+                style={styles.inventorySection}
+              >
+                <Text style={styles.sectionTitle}>Previous Exotic Equipment</Text>
+                <Text style={styles.sectionSubtitle}>Last items sold by Xûr (when he returns, inventory will refresh)</Text>
+                <Text style={styles.sectionSubtitle}>
+                  
+                  {exoticItems.length} item{exoticItems.length > 1 ? "s" : ""} from last visit
+                </Text>
+                {exoticItems.map((item, index) => (
+                  <XurItemCard
+                    key={`previous-exotic-${index}`}
+                    item={item}
+                    onPress={() => handleItemPress(item)}
+                  />
+                ))}
+              </LinearGradient>
+            )}
+
+            {/* Previous Special Offers */}
+            {specialOffers.length > 0 && (
+              <LinearGradient
+                colors={[
+                  Colors.destiny.dark,
+                  Colors.destiny.dark + "50",
+                  Colors.destiny.dark,
+                ]}
+                style={[styles.inventorySection, { paddingBottom: 60 }]}
+              >
+                <Text style={styles.sectionTitle}>Previous Special Offers</Text>
+                <Text style={styles.sectionSubtitle}>
+                  Quests and items from last visit
+                </Text>
+                {specialOffers.map((item, index) => (
+                  <XurItemCard
+                    key={`previous-special-${index}`}
+                    item={item}
+                    onPress={() => handleItemPress(item)}
+                  />
+                ))}
+              </LinearGradient>
+            )}
+          </>
+        )}
       </ScrollView>
     );
   }
@@ -668,5 +770,27 @@ const styles = StyleSheet.create({
   subtleTransition: {
     height: 40,
     backgroundColor: "transparent",
+  },
+
+  // Previous Inventory Section Styles
+  previousInventoryInfo: {
+    padding: 24,
+    paddingBottom: 12,
+    backgroundColor: "transparent",
+  },
+  previousInventoryTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+    color: Colors.destiny.ghost,
+    textAlign: "center",
+    marginBottom: 8,
+  },
+  previousInventorySubtitle: {
+    fontSize: 14,
+    color: Colors.destiny.ghost,
+    opacity: 0.7,
+    textAlign: "center",
+    lineHeight: 20,
+    fontStyle: "italic",
   },
 });
