@@ -66,6 +66,7 @@ export interface XurData {
     saleItems: { [key: string]: XurInventoryItem };
   };
   isAvailable: boolean;
+  message?: string;
 }
 
 export interface ApiResponse<T> {

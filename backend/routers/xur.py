@@ -17,13 +17,13 @@ async def get_xur_inventory():
     
     Returns Xûr's location and currently available exotic items
     with detailed information including names, descriptions, stats and rarity.
+    Always returns HTTP 200 with isAvailable flag indicating Xûr's availability.
     
     Returns:
-        dict: Complete Xûr inventory
+        dict: Complete Xûr inventory with availability status
     
     Raises:
         HTTPException: 502 if Bungie API is unavailable
-        HTTPException: 404 if Xûr is not currently available
         HTTPException: 500 if error processing data
     """
     # Xûr's vendor hash in Bungie API
@@ -36,32 +36,95 @@ async def get_xur_inventory():
     if vendor_data is None:
         raise HTTPException(status_code=502, detail="Upstream Bungie API error")
 
-    # Check if Xûr is available
+    # Check if Xûr is available in current vendors
     response = vendor_data.get('Response', {})
     vendors = response.get('vendors', {}).get('data', {})
+    bungie_has_xur = XUR_VENDOR_HASH in vendors
 
-    if XUR_VENDOR_HASH not in vendors:
-        raise HTTPException(status_code=404, detail="Xûr is not currently available")
+    # Check if Xûr should be available based on schedule (Paris time)
+    from datetime import datetime, timezone, timedelta
+    
+    # Paris timezone (UTC+1 or UTC+2 depending on daylight saving)
+    # For simplicity, assuming UTC+2 (summer time)
+    paris_offset = timedelta(hours=2)
+    paris_tz = timezone(paris_offset)
+    now_paris = datetime.now(paris_tz)
+    current_day = now_paris.weekday()  # 0 = Monday, 1 = Tuesday, ..., 4 = Friday, 5 = Saturday, 6 = Sunday
+    current_hour = now_paris.hour
+    
+    # Xûr is available from Friday 18h to Tuesday 18h (Paris time)
+    # Friday = 4, Saturday = 5, Sunday = 6, Monday = 0, Tuesday = 1
+    is_xur_scheduled = False
+    if current_day == 4 and current_hour >= 18:  # Friday after 18h
+        is_xur_scheduled = True
+    elif current_day in [5, 6, 0]:  # Saturday, Sunday, Monday
+        is_xur_scheduled = True
+    elif current_day == 1 and current_hour < 18:  # Tuesday before 18h
+        is_xur_scheduled = True
+    
+    # Use schedule-based availability (more reliable than Bungie API vendor list)
+    is_xur_currently_available = is_xur_scheduled
 
-    # Decode and filter for Xûr only
+    # Always try to get Xûr data - Bungie API keeps the last inventory even when he's gone
     try:
         decoded_data = manifest_decoder.decode_vendor_data(vendor_data)
+        
+        # Try to get Xûr data from the decoded response
+        xur_vendor_data = decoded_data['Response']['vendors']['data'].get(XUR_VENDOR_HASH, {})
+        xur_sales_data = decoded_data['Response']['sales']['data'].get(XUR_VENDOR_HASH, {})
+        
+        # If we have vendor data but no sales data, Xûr is not available but we can show his info
+        if not xur_vendor_data:
+            # No Xûr data at all - create basic structure
+            xur_vendor_data = {
+                'vendorHash': int(XUR_VENDOR_HASH),
+                'nextRefreshDate': '',
+                'enabled': False,
+                'name': 'Xûr',
+                'description': 'Agent of the Nine'
+            }
+        
+        if not xur_sales_data:
+            # No sales data - create empty sales structure
+            xur_sales_data = {'saleItems': {}}
 
         xur_response = {
-            'vendor': decoded_data['Response']['vendors']['data'].get(XUR_VENDOR_HASH, {}),
-            'sales': decoded_data['Response']['sales']['data'].get(XUR_VENDOR_HASH, {}),
-            'isAvailable': True
+            'vendor': xur_vendor_data,
+            'sales': xur_sales_data,
+            'isAvailable': is_xur_currently_available,
+            'message': 'Xûr is currently available' if is_xur_currently_available else 'Xûr is not currently available (showing last inventory)'
         }
 
         return {
             'Response': xur_response,
-            'ErrorCode': decoded_data.get('ErrorCode'),
-            'ThrottleSeconds': decoded_data.get('ThrottleSeconds')
+            'ErrorCode': decoded_data.get('ErrorCode', 0),
+            'ThrottleSeconds': decoded_data.get('ThrottleSeconds', 0)
         }
 
     except Exception as e:
         logger.error("Error decoding Xûr data: %s", e)
-        raise HTTPException(status_code=500, detail="Error processing Xûr data") from e
+        
+        # Return error but still with valid structure
+        xur_response = {
+            'vendor': {
+                'vendorHash': int(XUR_VENDOR_HASH),
+                'nextRefreshDate': '',
+                'enabled': False,
+                'name': 'Xûr',
+                'description': 'Agent of the Nine'
+            },
+            'sales': {
+                'saleItems': {}
+            },
+            'isAvailable': False,
+            'message': f'Error fetching Xûr data: {str(e)}'
+        }
+
+        return {
+            'Response': xur_response,
+            'ErrorCode': 1,
+            'ThrottleSeconds': 0
+        }
 
 
 @router.get("/debug")
