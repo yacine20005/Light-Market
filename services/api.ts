@@ -1,4 +1,5 @@
 // API configuration and base functions
+import { ConnectivityService } from './connectivity';
 
 const getApiBaseUrl = () => {
   // URL de production sans le slash final pour éviter les problèmes de redirection
@@ -60,18 +61,58 @@ export interface ApiResponse<T> {
 
 class ApiService {
   private async testConnectivity(): Promise<boolean> {
+    console.log(`🔍 [API] Testing connectivity...`);
+    
+    // Méthode 1: Test direct sur notre API
     try {
-      console.log(`🔍 [API] Testing basic connectivity...`);
+      console.log(`🔍 [API] Testing direct API connectivity...`);
+      const response = await fetch(`${API_BASE_URL}/health`, {
+        method: 'GET',
+        signal: AbortSignal.timeout(3000),
+        headers: {
+          'User-Agent': 'OrbitMarket/1.1.2 (Android)',
+        },
+      });
+      if (response.ok) {
+        console.log(`✅ [API] Direct API connectivity successful`);
+        return true;
+      }
+    } catch (error) {
+      console.log(`🔍 [API] Direct API test failed:`, error);
+    }
+
+    // Méthode 2: Test avec httpbin (fallback)
+    try {
+      console.log(`🔍 [API] Testing with httpbin fallback...`);
       const response = await fetch('https://httpbin.org/status/200', {
         method: 'GET',
-        signal: AbortSignal.timeout(5000),
+        signal: AbortSignal.timeout(3000),
       });
-      console.log(`🔍 [API] Connectivity test result: ${response.status}`);
-      return response.ok;
+      if (response.ok) {
+        console.log(`✅ [API] Httpbin connectivity successful`);
+        return true;
+      }
     } catch (error) {
-      console.log(`🔍 [API] Connectivity test failed:`, error);
-      return false;
+      console.log(`🔍 [API] Httpbin test failed:`, error);
     }
+
+    // Méthode 3: Test avec Google (dernier recours)
+    try {
+      console.log(`🔍 [API] Testing with Google DNS...`);
+      const response = await fetch('https://dns.google/resolve?name=google.com', {
+        method: 'GET',
+        signal: AbortSignal.timeout(3000),
+      });
+      if (response.ok) {
+        console.log(`✅ [API] Google DNS connectivity successful`);
+        return true;
+      }
+    } catch (error) {
+      console.log(`🔍 [API] Google DNS test failed:`, error);
+    }
+
+    console.log(`❌ [API] All connectivity tests failed`);
+    return false;
   }
 
   private async makeRequest<T>(endpoint: string): Promise<T> {
@@ -165,18 +206,24 @@ class ApiService {
   async getXurInventory(): Promise<ApiResponse<XurData>> {
     console.log(`🎯 [API] Getting Xur inventory...`);
     
-    // Test de connectivité d'abord
-    const hasConnectivity = await this.testConnectivity();
+    // Utilisation du nouveau service de connectivité avec retry
+    const hasConnectivity = await ConnectivityService.waitForConnection(3, 1500);
     console.log(`🌐 [API] Connectivity available: ${hasConnectivity}`);
     
+    // On essaie quand même la requête même si le test de connectivité échoue
     if (!hasConnectivity) {
-      throw new Error('🚫 Aucune connectivité réseau détectée');
+      console.warn(`⚠️ [API] Connectivity test failed, but attempting request anyway...`);
     }
     
     try {
       return await this.makeRequest<ApiResponse<XurData>>('/xur');
     } catch (error) {
       console.log(`⚠️ [API] Primary Xur endpoint failed, trying alternative approach...`);
+      
+      // Si on n'avait pas de connectivité ET que la requête échoue, alors on lance l'erreur de connectivité
+      if (!hasConnectivity) {
+        throw new Error('🚫 Aucune connectivité réseau détectée. Vérifiez votre connexion internet et réessayez.');
+      }
       
       // Si l'endpoint principal échoue, essayons de tester avec le debug endpoint
       try {

@@ -31,7 +31,10 @@
       "package": "com.yacine20005.orbitmarket",
       "permissions": [
         "INTERNET",
-        "ACCESS_NETWORK_STATE"
+        "ACCESS_NETWORK_STATE",
+        "ACCESS_WIFI_STATE",
+        "CHANGE_NETWORK_STATE",
+        "CHANGE_WIFI_STATE"
       ]
     },
     "web": {
@@ -52,7 +55,8 @@
         "expo-build-properties",
         {
           "android": {
-            "usesCleartextTraffic": true
+            "usesCleartextTraffic": true,
+            "networkSecurityConfig": "network_security_config"
           }
         }
       ]
